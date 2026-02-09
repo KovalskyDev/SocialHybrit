@@ -14,9 +14,7 @@
     <form method="POST">
         {% csrf_token %}
         <button type="submit">Yes, delete forever</button>
-        <h1>
-            <a href="{% url "post-detail" post_object.pk%}">No, I changed my mind (back)</a>
-        </h1>
     </form>
+    <h1><a href="{% url "post-detail" post_object.pk %}">No, I changed my mind (back)</a></h1>
 </body>
 </html>
