@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Post{{ post_object.name }}</title>
+</head>
+<body>
+    <h1>You will delete post: {{ post_object.name }}</h1>
+    <br>
+    <h2>This action cannot be undone!</h2>
+    
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Yes, delete forever</button>
+        <h1>
+            <a href="{% url "post-detail" post_object.pk%}">No, I changed my mind (back)</a>
+        </h1>
+    </form>
+</body>
+</html>

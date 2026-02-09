@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Create</title>
+</head>
+<body>
+    <h1>You are will create a Post:</h1>
+    <div style="margin-top: 20px;">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p}}
+            <button type="submit">Створити</button>
+        </form>
+    </div>
+    <a href="{% url "posts-list" %}">Go to all Posts</a>
+</body>
+</html>
