@@ -107,6 +107,7 @@ STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'MainPage.CustomUsers'
 
 LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "posts-list"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

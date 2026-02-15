@@ -6,6 +6,12 @@
     <title>Document</title>
 </head>
 <body>
+    <form action="{% url 'logout' %}" method="post" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger btn-round py-1 px-3" style="font-size: 0.8rem;">
+            Вийти
+        </button>
+    </form>
     <h3><a href="{% url "post-create" %}">Create Post</a></h2>
     <hr>
     <h1>All Posts</h1>
