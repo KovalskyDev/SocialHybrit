@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Вхід</h2>
+        <p class="text-muted small">Ласкаво просимо назад!</p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="text-center mb-3 custom-form">
+            {{ form.as_p }}
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="mb-4 btn btn-primary btn-round py-1 shadow-sm">Увійти</button>
+        </div>
+    </form>
+
+    <hr class="my-4" style="opacity: 0.1;">
+
+    <div class="text-center">
+        <p class="small text-muted mb-2">Ще не маєте акаунту?</p>
+        <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-round btn-sm px-4">
+            Зареєструватись
+        </a>
+    </div>
+</body>
+</html>

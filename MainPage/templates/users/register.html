@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-sm p-4 mt-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Реєстрація</h2>
+                <p class="text-muted small">Приєднуйтесь до нашої спільноти</p>
+            </div>
+
+            <form method="post" class="custom-form pb-3" style="overflow: visible;">
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-round py-2 shadow-sm">Зареєструватись</button>
+                </div>
+            </form>
+
+            <hr class="my-4" style="opacity: 0.1;">
+            <div class="text-center">
+                <p class="small text-muted mb-2">Вже маєте акаунт?</p>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-round btn-sm px-4">Увійти</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
