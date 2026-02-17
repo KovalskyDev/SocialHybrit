@@ -35,6 +35,23 @@ class CustomUser(AbstractUser):
         """Проверяет, является ли пользователь администратором через поле role."""
         return self.role == self.ROLE_ADMIN
     
+    def can_manage(self, user, allow_admin=True):
+        """
+        Проверяет, может ли конкретный юзер управлять этим постом.
+        """
+        if not user or user.is_anonymous:
+            return False
+        
+        # Если это сам владелец профиля — всегда можно
+        if self == user:
+            return True
+            
+        # Если это админ — проверяем, разрешено ли админам здесь хозяйничать
+        if getattr(user, 'is_admin', False) and allow_admin:
+            return True
+            
+        return False
+    
 class Post(models.Model):
     name = models.CharField(max_length=40)
     about = models.TextField()
@@ -48,12 +65,20 @@ class Post(models.Model):
         verbose_name = "Post"
         verbose_name_plural = "Posts"
     
-    def can_manage(self, user):
+    def can_manage(self, user, allow_admin=True):
         """
         Проверяет, может ли конкретный юзер управлять этим постом.
-        Используется в шаблонах и во вьюхах.
         """
         if not user or user.is_anonymous:
             return False
-        return self.creator == user or user.is_admin
+        
+        # Если это сам владелец профиля — всегда можно
+        if self.creator == user:
+            return True
+            
+        # Если это админ — проверяем, разрешено ли админам здесь хозяйничать
+        if getattr(user, 'is_admin', False) and allow_admin:
+            return True
+            
+        return False
         
