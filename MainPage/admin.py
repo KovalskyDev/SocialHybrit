@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Posts, CustomUsers
+from .models import Post, CustomUser
 
-@admin.register(Posts)
-class PostsAdmin(admin.ModelAdmin):
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
     pass
-@admin.register(CustomUsers)
-class CustomUsersAdmin(admin.ModelAdmin):
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
     pass

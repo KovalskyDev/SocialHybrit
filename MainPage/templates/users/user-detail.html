@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}UserDetail{% endblock title %}
+
+{% block content %}
+<div>
+    <p>Username: {{ cmuser_object.username }}</p>
+    <p>Name: {{ cmuser_object.first_name }}</p>
+    <p>SurName: {{ cmuser_object.last_name }}</p>
+
+    {% if cmuser_object.age %}<p>Age: {{ cmuser_object.age }}</p>{% endif %}
+
+    <p>Gender: {{ ucmuser_objectt.gender }}</p>
+    <p>Email: {{ cmuser_object.email }}</p>
+
+    <hr>
+    <a href="{% url "user-delete" cmuser_object.pk %}">Delete this Account</a>
+    <br>
+    <a href="{% url "user-update" cmuser_object.pk %}">Update this Account</a>
+    <hr>
+    <a href="{% url "post-list" %}">Go to all Posts</a>
+</div>
+{% endblock content %}

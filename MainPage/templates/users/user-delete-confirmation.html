@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}DeletePost{% endblock title %}
+{% block title %}DeleteUser{% endblock title %}
 
 {% block content %}
-<h1>You will delete post: {{ post_object.name }}</h1>
+<h1>You will delete user: {{ cmuser_object.username }}</h1>
 <br>
 <h2>This action cannot be undone!</h2>
 
@@ -11,5 +11,5 @@
     {% csrf_token %}
     <button type="submit">Yes, delete forever</button>
 </form>
-<h1><a href="{% url "post-detail" post_object.pk %}">No, I changed my mind (back)</a></h1>
+<h1><a href="{% url "user-detail" cmuser_object.pk %}">No, I changed my mind (back)</a></h1>
 {% endblock content %}

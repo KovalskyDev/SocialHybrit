@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-class CustomUsers(AbstractUser):
+class CustomUser(AbstractUser):
     GENDER_FEMALE = "female"
     GENDER_MALE = "male"
 
@@ -32,13 +32,14 @@ class CustomUsers(AbstractUser):
     
     @property
     def is_admin(self):
+        """Проверяет, является ли пользователь администратором через поле role."""
         return self.role == self.ROLE_ADMIN
     
-class Posts(models.Model):
+class Post(models.Model):
     name = models.CharField(max_length=40)
     about = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(CustomUsers, on_delete=models.SET_NULL, null=True)
+    creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="posts")
 
     def __str__(self):
         return self.name
@@ -46,3 +47,13 @@ class Posts(models.Model):
     class Meta:
         verbose_name = "Post"
         verbose_name_plural = "Posts"
+    
+    def can_manage(self, user):
+        """
+        Проверяет, может ли конкретный юзер управлять этим постом.
+        Используется в шаблонах и во вьюхах.
+        """
+        if not user or user.is_anonymous:
+            return False
+        return self.creator == user or user.is_admin
+        

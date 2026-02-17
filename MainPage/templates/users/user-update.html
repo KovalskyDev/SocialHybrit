@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}PostDetail{% endblock title %}
+{% block title %}UserUpdate{% endblock title %}
 
 {% block content %}
-
-<h1>You are will update a Post: {{ post_object.name }}</h1>
+<h1>You are will update a User: {{ cmuser_object.username }}</h1>
 <div style="margin-top: 20px;">
     <form method="POST">
         {% csrf_token %}
@@ -13,6 +12,5 @@
     </form>
 </div>
 <hr>
-<a href="{% url "post-detail" post_object.pk %}">Go back</a>
-
+<a href="{% url "user-detail" cmuser_object.pk %}">Go back</a>
 {% endblock content %}
