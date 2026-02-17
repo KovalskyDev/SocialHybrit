@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <p>Post name: {{ post_object.name }}</p>
-    <p>Post description: {{ post_object.about }}</p>
-    <hr>
-    <a href="{% url "post-delete" post_object.pk %}">Delete this Post</a>
-    <br>
-    <a href="{% url "post-update" post_object.pk %}">Update this Post</a>
-    <hr>
-    <a href="{% url "posts-list" %}">Go to all posts</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}PostDetail{% endblock title %}
+
+{% block content %}
+<p><a href="{% url 'user-detail' post_object.creator.pk %}">Useriskha: {{ post_object.creator.username }}</a></p>
+<p>Post name: {{ post_object.name }}</p>
+<p>Post description: {{ post_object.about }}</p>
+<hr>
+<a href="{% url "post-delete" post_object.pk %}">Delete this Post</a>
+<br>
+<a href="{% url "post-update" post_object.pk %}">Update this Post</a>
+<hr>
+<a href="{% url "post-list" %}">Go to all Posts</a>
+
+{% endblock content %}
