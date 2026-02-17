@@ -33,6 +33,7 @@ class DeleteCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView
     template_name = "users/user-delete-confirmation.html"
     success_url = reverse_lazy("post-list")
     context_object_name = "cmuser_object"
+    admin_allowed = False
 
 class DetailCustomUserView(DetailView):
     model = models.CustomUser
@@ -44,6 +45,7 @@ class UpdateCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView
     template_name = "users/user-update.html"
     context_object_name = "cmuser_object"
     form_class = forms.CustomUserUpdateForm
+    admin_allowed = False
 
     def get_success_url(self):
         return reverse("user-detail", kwargs={"pk": self.object.pk})
