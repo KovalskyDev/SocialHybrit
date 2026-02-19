@@ -1,8 +1,48 @@
-<footer class="footer text-center">
+<footer class="footer py-5 mt-auto">
     <div class="container">
-        <div class="mb-1">
-            <span class="fw-bold text-white small">Social<span class="brand-dot">Hybrit</span></span>
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-3">
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Про нас</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Допомога</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Преса</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">API</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Вакансії</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Конфіденційність</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Умови</a>
+            <a href="#" class="text-decoration-none text-secondary small-footer-link">Локації</a>
         </div>
-        <p style="font-size: 0.75rem;" class="mb-0 text-secondary">© 2026 SocialHybrit. Всі права захищені.</p>
+
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <span class="text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">
+                UKRAINIAN <i class="bi bi-chevron-down ms-1"></i>
+            </span>
+            <p style="font-size: 0.75rem;" class="mb-0 text-secondary opacity-75">
+                © 2026 SOCIALHYBRIT FROM ME
+            </p>
+        </div>
     </div>
 </footer>
+
+<style>
+    .footer {
+        background-color: #fafafa; /* Тот же цвет, что и у фона страницы */
+        border-top: 1px solid #dbdbdb;
+    }
+    
+    .small-footer-link {
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    
+    .small-footer-link:hover {
+        color: #262626 !important;
+        text-decoration: underline !important;
+    }
+
+    /* Чтобы футер всегда был прижат к низу, если контента мало */
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+</style>

@@ -10,6 +10,13 @@ from MainPage import models
 from MainPage import forms
 
 
+def error_403(request, exception):
+    return render(request, '403.html', status=403)
+
+def error_404(request, exception):
+    return render(request, '404.html', status=404)
+
+
 class CustomLoginView(LoginView):
     template_name = "users/login.html"
     next_page = reverse_lazy("post-list")

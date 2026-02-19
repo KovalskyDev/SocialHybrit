@@ -3,35 +3,110 @@
 {% block title %}Вхід{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5 col-lg-4">
-        <div class="card border-0 shadow-sm p-4 mt-5">
-            <div class="text-center mb-4">
-                <h2 class="fw-bold">Вхід</h2>
-                <p class="text-muted small">Ласкаво просимо назад!</p>
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+        
+        <div class="card border-1 border-light-subtle rounded-0 p-4 bg-white">
+            <div class="text-center mb-4 mt-3">
+                <h1 class="navbar-brand fs-2 fw-bold">Social<span class="text-primary">Hybrit</span></h1>
             </div>
 
-            <form method="post">
+            <form method="post" novalidate>
                 {% csrf_token %}
 
-                <div class="mb-3 custom-form">
-                    {{ form.as_p }}
-                </div>
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small">
+                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
 
-                <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary btn-round py-2 shadow-sm">Увійти</button>
+                {% for field in form %}
+                    <div class="mb-2">
+                        <input type="{{ field.field.widget.input_type }}" 
+                               name="{{ field.name }}" 
+                               id="{{ field.id_for_label }}"
+                               class="form-control bg-light border-light-subtle rounded-1 py-2" 
+                               placeholder="{{ field.label }}"
+                               {% if field.value %}value="{{ field.value }}"{% endif %}
+                               style="font-size: 0.85rem;">
+                        
+                        {% if field.errors %}
+                            <div class="text-danger" style="font-size: 0.75rem;">
+                                {{ field.errors|first }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary fw-bold py-2 shadow-none border-0 btn-login-custom" style="background-color: #0095f6;">
+                        Увійти
+                    </button>
                 </div>
             </form>
 
-            <hr class="my-4" style="opacity: 0.1;">
+            <div class="position-relative my-4">
+                <hr class="text-muted opacity-25">
+                <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted fw-bold small">АБО</span>
+            </div>
 
-            <div class="text-center">
-                <p class="small text-muted mb-2">Ще не маєте акаунту?</p>
-                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-round btn-sm px-4">
-                    Зареєструватись
+            <div class="text-center mb-3">
+                <a href="#" class="text-decoration-none small fw-bold" style="color: #385185;">
+                    <i class="bi bi-facebook me-1"></i> Увійти через Facebook
                 </a>
             </div>
         </div>
+
+        <div class="card border-1 border-light-subtle rounded-0 mt-3 p-3 bg-white text-center">
+            <p class="small m-0">
+                Ще не маєте акаунту? 
+                <a href="{% url 'register' %}" class="text-decoration-none fw-bold text-primary">Зареєструватися</a>
+            </p>
+        </div>
+
     </div>
 </div>
-{% endblock content%}
+
+<style>
+    body { background-color: #fafafa !important; }
+
+    /* Поля ввода: плавное изменение рамки */
+    .form-control {
+        transition: border-color 0.2s ease-in-out;
+    }
+    .form-control:focus {
+        background-color: #fafafa !important;
+        border-color: #a8a8a8 !important; /* Чуть темнее при фокусе */
+        box-shadow: none !important;
+    }
+
+    /* Главная кнопка: эффект нажатия и наведения */
+    .btn-login-custom {
+        transition: background-color 0.2s ease, transform 0.1s ease !important;
+    }
+    .btn-login-custom:hover {
+        background-color: #1877f2 !important; /* Цвет чуть насыщеннее */
+    }
+    .btn-login-custom:active {
+        transform: scale(0.98); /* Эффект "проседания" при клике */
+    }
+
+    /* Ссылки: эффект затухания */
+    .text-primary, .fw-bold, i {
+        transition: opacity 0.2s ease;
+    }
+    a:hover {
+        opacity: 0.7;
+    }
+
+    /* Анимация появления всей карточки (небольшой fade-in) */
+    .card {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock content %}

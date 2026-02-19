@@ -23,3 +23,6 @@ urlpatterns = [
     path("", include("MainPage.urls"))
     
 ]
+
+handler403 = 'MainPage.views.error_403'
+handler404 = 'MainPage.views.error_404'

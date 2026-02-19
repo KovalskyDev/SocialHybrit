@@ -3,52 +3,101 @@
 {% block title %}Реєстрація{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card border-0 shadow-sm p-4 mt-4">
-            <div class="text-center mb-4">
-                <h2 class="fw-bold">Реєстрація</h2>
-                <p class="text-muted small">Приєднуйтесь до нашої спільноти</p>
+<div class="row justify-content-center align-items-center my-5">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+        
+        <div class="card border-1 border-light-subtle rounded-0 p-4 bg-white shadow-sm register-card">
+            <div class="text-center mb-3 mt-3">
+                <h1 class="navbar-brand fs-2 fw-bold">Social<span class="text-primary">Hybrit</span></h1>
+                <p class="text-muted fw-bold small px-3">Зареєструйтеся, щоб переглядати фото та відео своїх друзів.</p>
+                <button class="btn btn-primary btn-sm w-100 fw-bold py-2 mb-3 shadow-none border-0" style="background-color: #0095f6;">
+                    <i class="bi bi-facebook me-2"></i> Увійти через Facebook
+                </button>
+                
+                <div class="position-relative my-4">
+                    <hr class="text-muted opacity-25">
+                    <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted fw-bold small">АБО</span>
+                </div>
             </div>
 
-            <form method="post" class="custom-form pb-3" style="overflow: visible;">
+            <form method="post" novalidate>
                 {% csrf_token %}
 
                 {% for field in form %}
-                    <div class="form-group-wrapper">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-
-                        {# Само поле ввода #}
-                        {{ field }}
-
-                        {# Ошибки конкретного поля #}
+                    <div class="mb-2">
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                               name="{{ field.name }}" 
+                               id="{{ field.id_for_label }}"
+                               class="form-control bg-light border-light-subtle rounded-1 py-2" 
+                               placeholder="{{ field.label }}"
+                               {% if field.value %}value="{{ field.value }}"{% endif %}
+                               style="font-size: 0.85rem;">
+                        
                         {% if field.errors %}
-                            <div class="errorlist">
-                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            <div class="text-danger mb-1" style="font-size: 0.7rem;">
+                                {{ field.errors|first }}
                             </div>
                         {% endif %}
 
                         {% if field.help_text %}
-                            <div class="help-text-container">
-                                <div class="help-text-content">
-                                    {{ field.help_text|safe }}
-                                </div>
+                            <div class="text-muted mb-2 px-1" style="font-size: 0.65rem; line-height: 1.2;">
+                                {{ field.help_text|safe|truncatechars:100 }}
                             </div>
                         {% endif %}
                     </div>
                 {% endfor %}
 
-                <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary btn-round py-2 shadow-sm">Зареєструватись</button>
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary fw-bold py-2 shadow-none border-0 btn-register-custom" style="background-color: #0095f6; opacity: 0.8;">
+                        Зареєструватися
+                    </button>
                 </div>
-            </form>
 
-            <hr class="my-4" style="opacity: 0.1;">
-            <div class="text-center">
-                <p class="small text-muted mb-2">Вже маєте акаунт?</p>
-                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-round btn-sm px-4">Увійти</a>
-            </div>
+                <p class="text-center text-muted mt-3 px-2" style="font-size: 0.7rem;">
+                    Реєструючись, ви погоджуєтеся з нашими <strong>Умовами</strong>, <strong>Політикою конфіденційності</strong> та <strong>Політикою щодо файлів cookie</strong>.
+                </p>
+            </form>
+        </div>
+
+        <div class="card border-1 border-light-subtle rounded-0 mt-3 p-3 bg-white text-center">
+            <p class="small m-0">
+                Є акаунт? 
+                <a href="{% url 'login' %}" class="text-decoration-none fw-bold text-primary">Увійти</a>
+            </p>
         </div>
     </div>
 </div>
+
+<style>
+    body { background-color: #fafafa !important; }
+
+    /* Поля ввода */
+    .form-control:focus {
+        background-color: #fafafa !important;
+        border-color: #dbdbdb !important;
+        box-shadow: none !important;
+    }
+
+    /* Анимация появления (как в логине) */
+    .register-card {
+        animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Кнопка */
+    .btn-register-custom {
+        transition: all 0.2s ease;
+    }
+    .btn-register-custom:hover {
+        opacity: 1 !important;
+        background-color: #1877f2 !important;
+    }
+    .btn-register-custom:active {
+        transform: scale(0.97);
+    }
+</style>
 {% endblock %}

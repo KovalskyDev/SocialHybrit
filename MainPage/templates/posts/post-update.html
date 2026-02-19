@@ -1,18 +1,129 @@
 {% extends "base.html" %}
 
-{% block title %}PostDetail{% endblock title %}
+{% block title %}Редагувати Поста{% endblock %}
 
 {% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-md-8 col-lg-6">
+        
+        <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm update-post-card">
+            
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <a href="{% url 'post-detail' post_object.pk %}" class="text-decoration-none text-dark small">Скасувати</a>
+                <h6 class="m-0 fw-bold text-secondary">Редагувати допис</h6>
+                <button type="submit" form="update-post-form" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">
+                    Зберегти
+                </button>
+            </div>
 
-<h1>You are will update a Post: {{ post_object.name }}</h1>
-<div style="margin-top: 20px;">
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p}}
-        <button type="submit">Update</button>
-    </form>
+            <form method="POST" id="update-post-form" novalidate>
+                {% csrf_token %}
+                
+                <div class="card-body p-0">
+                    <div class="p-3 border-bottom bg-light-subtle bg-opacity-10">
+                        <label class="text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05rem; text-transform: uppercase;">Заголовок</label>
+                        <textarea name="name" maxlength="100" required id="id_name" 
+                                  class="form-control border-0 shadow-none bg-transparent p-0 fw-bold auto-expand" 
+                                  placeholder="Назва допису..." 
+                                  style="font-size: 1.25rem; resize: none; overflow: hidden; min-height: 30px;"
+                                  rows="1">{{ form.name.value|default:post_object.name }}</textarea>
+                        
+                        {% if form.name.errors %}
+                            <div class="text-danger mt-1" style="font-size: 0.75rem;">{{ form.name.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-3">
+                        <label class="text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05rem; text-transform: uppercase;">Опис</label>
+                        <textarea name="about" maxlength="2200" required id="id_about" 
+                                  class="form-control border-0 shadow-none p-0 auto-expand" 
+                                  placeholder="Про що цей допис?" 
+                                  style="resize: none; overflow: hidden; font-size: 1rem; min-height: 200px;"
+                                  rows="1">{{ form.about.value|default:post_object.about }}</textarea>
+                        <div class="text-end mt-1">
+                            <span id="char-count" class="text-muted" style="font-size: 0.75rem;">0</span>
+                            <span class="text-muted" style="font-size: 0.75rem;"> / 2200</span>
+                        </div>
+                        
+                        {% if form.about.errors %}
+                            <div class="text-danger mt-1" style="font-size: 0.75rem;">{{ form.about.errors|first }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="text-center mt-4">
+            <p class="text-muted small">
+                Створено: {{ post_object.created_at|date:"d.m.Y H:i" }}
+            </p>
+        </div>
+    </div>
 </div>
-<hr>
-<a href="{% url "post-detail" post_object.pk %}">Go back</a>
 
-{% endblock content %}
+<script>
+    const autoExpandFields = document.querySelectorAll('.auto-expand');
+    const textareaAbout = document.getElementById('id_about');
+    const charCount = document.getElementById('char-count');
+    const MAX_CHARS = 2200;
+
+    const adjustHeight = (el) => {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    };
+
+    autoExpandFields.forEach(field => {
+        field.addEventListener('input', () => adjustHeight(field));
+        adjustHeight(field);
+    });
+
+    const handleAboutInput = (e) => {
+        // Проверяем: если длина уже превышена, только тогда обрезаем
+        // Это предотвратит прыжки курсора при обычном наборе текста
+        if (textareaAbout.value.length > MAX_CHARS) {
+            const start = textareaAbout.selectionStart; // Запоминаем где был курсор
+            const end = textareaAbout.selectionEnd;
+            
+            textareaAbout.value = textareaAbout.value.substring(0, MAX_CHARS);
+            
+            // Возвращаем курсор на место, чтобы не прыгало
+            textareaAbout.setSelectionRange(start, end);
+        }
+
+        const currentLength = textareaAbout.value.length;
+        charCount.textContent = currentLength;
+
+        if (currentLength >= 2100) {
+            charCount.classList.remove('text-muted');
+            charCount.classList.add('text-danger');
+        } else {
+            charCount.classList.remove('text-danger');
+            charCount.classList.add('text-muted');
+        }
+    };
+
+    textareaAbout.addEventListener('input', handleAboutInput);
+    handleAboutInput();
+</script>
+
+<style>
+    body { background-color: #fafafa !important; }
+
+    .form-control:focus {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .update-post-card {
+        animation: slideUpFade 0.5s ease-out;
+    }
+
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-link { transition: opacity 0.2s, transform 0.1s; }
+    .btn-link:active { transform: scale(0.95); }
+</style>
+{% endblock %}
