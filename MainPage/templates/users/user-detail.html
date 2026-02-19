@@ -1,23 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}UserDetail{% endblock title %}
+{% block title %}Профіль Користувача{% endblock %}
 
 {% block content %}
-<div>
-    <p>Username: {{ cmuser_object.username }}</p>
-    <p>Name: {{ cmuser_object.first_name }}</p>
-    <p>SurName: {{ cmuser_object.last_name }}</p>
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-10">
+        
+        <div class="row mb-5 align-items-center">
+            <div class="col-4 col-md-3 text-center">
+                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center shadow-sm" 
+                     style="width: clamp(80px, 15vw, 150px); height: clamp(80px, 15vw, 150px); font-size: 3rem;">
+                    {{ cmuser_object.username|slice:":1"|upper }}
+                </div>
+            </div>
+            
+            <div class="col-8 col-md-9">
+                <div class="d-flex flex-wrap align-items-center mb-3">
+                    <h2 class="fw-light me-4 mb-2 mb-md-0">{{ cmuser_object.username }}</h2>
+                    
+                    {% if user.is_authenticated %}
+                        {% if cmuser_object.pk == user.pk%}
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'user-update' cmuser_object.pk %}" class="btn btn-sm btn-outline-dark fw-bold px-3">Редагувати профіль</a>
+                                <a href="{% url 'user-delete' cmuser_object.pk %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        {% else %}
+                            <button class="btn btn-sm btn-primary fw-bold px-4 shadow-none border-0" style="background-color: #0095f6;">Підписатися</button>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-sm btn-primary fw-bold px-4 shadow-none border-0" style="background-color: #0095f6;">
+                            Підписатися
+                        </a>
+                    {% endif %}
+                </div>
 
-    {% if cmuser_object.age %}<p>Age: {{ cmuser_object.age }}</p>{% endif %}
+                <div class="d-flex mb-3 gap-4">
+                    <div><strong>{{ cmuser_object.posts.count }}</strong> дописів</div>
+                    <div><strong>0</strong> читачів</div>
+                    <div><strong>0</strong> відстежуваних</div>
+                </div>
 
-    <p>Gender: {{ ucmuser_objectt.gender }}</p>
-    <p>Email: {{ cmuser_object.email }}</p>
+                <div class="small">
+                    <div class="fw-bold">{{ cmuser_object.first_name }} {{ cmuser_object.last_name }}</div>
+                    {% if cmuser_object.age %}<span>Вік: {{ cmuser_object.age }}</span><br>{% endif %}
+                    <span class="text-secondary">Стать: {{ cmuser_object.get_gender_display|default:"Не вказано" }}</span>
+                </div>
+            </div>
+        </div>
 
-    <hr>
-    <a href="{% url "user-delete" cmuser_object.pk %}">Delete this Account</a>
-    <br>
-    <a href="{% url "user-update" cmuser_object.pk %}">Update this Account</a>
-    <hr>
-    <a href="{% url "post-list" %}">Go to all Posts</a>
+        <hr>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+            {% for post in cmuser_object.posts.all %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 position-relative post-card">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold text-truncate">{{ post.name }}</h5>
+                            <p class="card-text text-muted small flex-grow-1">
+                                {{ post.about|truncatechars:100 }}
+                            </p>
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size: 0.7rem;">{{ post.created_at|date:"d.m.Y" }}</span>
+                                <a href="{% url 'post-detail' post.pk %}" class="stretched-link text-decoration-none text-primary fw-bold small">Читати далі</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-camera text-secondary display-1"></i>
+                    <p class="text-secondary mt-3">Дописів ще немає.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
 </div>
 {% endblock content %}

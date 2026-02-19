@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Доступ заборонено{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <div class="mb-4">
+            <i class="bi bi-shield-lock text-secondary opacity-25" style="font-size: 6rem;"></i>
+        </div>
+        
+        <h2 class="fw-bold mb-3">На жаль, ця сторінка недоступна</h2>
+        <p class="text-secondary mb-4 px-md-5">
+            Можливо, у вас немає прав для перегляду цього контенту, або посилання, за яким ви перейшли, застаріло.
+        </p>
+        
+        <div class="d-flex gap-2 justify-content-center">
+            <a href="{% url 'post-list' %}" class="btn btn-primary fw-bold px-4 rounded-3 shadow-none border-0" style="background-color: #0095f6;">
+                На головну
+            </a>
+            <button onclick="history.back()" class="btn btn-link text-decoration-none fw-bold text-dark">
+                Повернутися назад
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Плавное появление ошибки */
+    .row {
+        animation: fadeInError 0.4s ease-out;
+    }
+    @keyframes fadeInError {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+{% endblock %}

@@ -1,16 +1,108 @@
 {% extends "base.html" %}
 
-{% block title %}UserUpdate{% endblock title %}
+{% block title %}Налаштування профілю{% endblock %}
 
 {% block content %}
-<h1>You are will update a User: {{ cmuser_object.username }}</h1>
-<div style="margin-top: 20px;">
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p}}
-        <button type="submit">Update</button>
-    </form>
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-md-10 col-lg-8">
+        
+        <div class="card border-1 border-light-subtle rounded-1 bg-white shadow-sm overflow-hidden">
+            <div class="row g-0">
+                
+                <div class="col-md-3 border-end d-none d-md-block bg-light-subtle">
+                    <div class="p-3">
+                        <div class="fw-bold mb-4 mt-2 px-2" style="font-size: 0.9rem;">Налаштування</div>
+                        <nav class="nav flex-column">
+                            <a class="nav-link text-dark fw-bold border-start border-3 border-dark ps-2 py-2 mb-2 active" href="#" style="font-size: 0.85rem;">Редагувати профіль</a>
+                            <a class="nav-link text-secondary ps-3 py-2 mb-2" href="#" style="font-size: 0.85rem;">Змінити пароль</a>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-9 p-4 p-md-5">
+                    
+                    <div class="d-flex align-items-center mb-5">
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-4 shadow-sm" 
+                             style="width: 45px; height: 45px; font-size: 1.2rem;">
+                            {{ cmuser_object.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <h5 class="m-0 fw-bold" style="font-size: 1.1rem;">{{ cmuser_object.username }}</h5>
+                            <a href="#" class="text-primary text-decoration-none fw-bold small">Змінити фото профілю</a>
+                        </div>
+                    </div>
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="row mb-4 align-items-center">
+                                <label for="{{ field.id_for_label }}" class="col-sm-3 col-form-label text-sm-end fw-bold px-3" style="font-size: 0.9rem;">
+                                    {{ field.label }}
+                                </label>
+                                
+                                <div class="col-sm-9 col-lg-7">
+                                    {% if field.field.widget.input_type == 'select' %}
+                                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-select bg-light-subtle border-light-subtle rounded-1 py-2" style="font-size: 0.85rem;">
+                                            {% for choice in field.field.choices %}
+                                                <option value="{{ choice.0 }}" {% if choice.0 == field.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                                               name="{{ field.name }}" 
+                                               id="{{ field.id_for_label }}"
+                                               class="form-control bg-light-subtle border-light-subtle rounded-1 py-2" 
+                                               value="{{ field.value|default:'' }}"
+                                               style="font-size: 0.85rem;">
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        <div class="text-danger mt-1" style="font-size: 0.75rem;">
+                                            {{ field.errors|first }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <div class="row mt-5">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9">
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-bold btn-update-profile" style="background-color: #0095f6; font-size: 0.85rem;">
+                                    Надіслати
+                                </button>
+                                <a href="{% url 'user-detail' cmuser_object.pk %}" class="btn btn-link text-decoration-none text-dark small ms-3 fw-bold">Скасувати</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<hr>
-<a href="{% url "user-detail" cmuser_object.pk %}">Go back</a>
+
+<style>
+    body { background-color: #fafafa !important; }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: #fff !important;
+        border-color: #dbdbdb !important;
+        box-shadow: none !important;
+    }
+
+    /* Анимация (плавный въезд справа) */
+    .card {
+        animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .btn-update-profile:active {
+        transform: scale(0.96);
+    }
+</style>
 {% endblock content %}

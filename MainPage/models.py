@@ -53,8 +53,8 @@ class CustomUser(AbstractUser):
         return False
     
 class Post(models.Model):
-    name = models.CharField(max_length=40)
-    about = models.TextField()
+    name = models.CharField(max_length=100)
+    about = models.TextField(max_length=2200)
     created_at = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="posts")
 

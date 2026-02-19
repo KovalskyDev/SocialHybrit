@@ -1,15 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}DeletePost{% endblock title %}
+{% block title %}Видалити допис{% endblock %}
 
 {% block content %}
-<h1>You will delete post: {{ post_object.name }}</h1>
-<br>
-<h2>This action cannot be undone!</h2>
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+        
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden delete-card">
+            <div class="card-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-octagon text-danger display-4"></i>
+                </div>
+                
+                <h5 class="fw-bold mb-2">Видалити допис?</h5>
+                <p class="text-muted small px-3">
+                    Ви впевнені, що хочете видалити <strong>"{{ post_object.name }}"</strong>? 
+                    Цю дію неможливо буде скасувати.
+                </p>
+            </div>
 
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit">Yes, delete forever</button>
-</form>
-<h1><a href="{% url "post-detail" post_object.pk %}">No, I changed my mind (back)</a></h1>
+            <div class="d-flex flex-column border-top">
+                <form method="POST" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link w-100 py-3 text-danger fw-bold text-decoration-none border-bottom rounded-0 delete-btn-hover">
+                        Видалити назавжди
+                    </button>
+                </form>
+                
+                <a href="{% url 'post-detail' post_object.pk %}" class="btn btn-link w-100 py-3 text-dark text-decoration-none small rounded-0">
+                    Скасувати
+                </a>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <p class="text-secondary" style="font-size: 0.75rem;">
+                SocialHybrit піклується про ваш контент. Подумайте двічі!
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: rgba(0,0,0,0.05) !important; }
+
+    /* Центрированная карточка с анимацией "встряхивания" или мягкого появления */
+    .delete-card {
+        animation: modalShow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes modalShow {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Ховер на опасную кнопку */
+    .delete-btn-hover {
+        transition: background-color 0.2s;
+    }
+    .delete-btn-hover:hover {
+        background-color: #fff1f1 !important;
+    }
+
+    /* Убираем лишние рамки у ссылок-кнопок */
+    .btn-link:focus {
+        box-shadow: none;
+    }
+</style>
 {% endblock content %}

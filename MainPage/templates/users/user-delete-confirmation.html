@@ -1,15 +1,71 @@
 {% extends "base.html" %}
 
-{% block title %}DeleteUser{% endblock title %}
+{% block title %}Видалення акаунту{% endblock %}
 
 {% block content %}
-<h1>You will delete user: {{ cmuser_object.username }}</h1>
-<br>
-<h2>This action cannot be undone!</h2>
+<div class="row justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+        
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden user-delete-card">
+            <div class="card-body p-4 p-md-5 text-center">
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger" style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-x fs-1"></i>
+                    </div>
+                </div>
 
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit">Yes, delete forever</button>
-</form>
-<h1><a href="{% url "user-detail" cmuser_object.pk %}">No, I changed my mind (back)</a></h1>
+                <h4 class="fw-bold mb-3">Видалити акаунт?</h4>
+                <p class="text-muted small mb-4 px-2">
+                    Нам прикро, що ви йдете, <strong>{{ cmuser_object.username }}</strong>. 
+                    Ваші дописи, профіль та налаштування будуть видалені назавжди. Це рішення остаточне.
+                </p>
+
+                <form method="POST" class="d-grid gap-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger fw-bold py-2 rounded-3 shadow-none border-0 btn-delete-confirm">
+                        Так, видалити назавжди
+                    </button>
+                    <a href="{% url 'user-detail' cmuser_object.pk %}" class="btn btn-light fw-bold py-2 rounded-3 text-secondary border-0">
+                        Я передумав(-ла)
+                    </a>
+                </form>
+            </div>
+            
+            <div class="card-footer bg-light border-0 py-3 text-center">
+                <span class="text-muted" style="font-size: 0.75rem;">SocialHybrit буде сумувати за вами 💔</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #fafafa !important; }
+
+    /* Анимация: карточка "всплывает" и немного дрожит при появлении */
+    .user-delete-card {
+        animation: shakeIn 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes shakeIn {
+        0% { opacity: 0; transform: translateY(30px); }
+        20%, 40%, 60%, 80% { transform: translateX(-2px); }
+        30%, 50%, 70% { transform: translateX(2px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Эффект на опасную кнопку */
+    .btn-delete-confirm {
+        transition: all 0.2s ease;
+    }
+    .btn-delete-confirm:hover {
+        background-color: #dc3545 !important;
+        filter: brightness(0.9);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
+    }
+
+    .btn-light:hover {
+        background-color: #e9ecef !important;
+        color: #212529 !important;
+    }
+</style>
 {% endblock content %}
