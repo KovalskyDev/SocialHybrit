@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.views import LoginView, LogoutView
@@ -73,7 +73,19 @@ class ListPostView(ListView):
     template_name = "posts/post-list.html"
     context_object_name = "posts_objects"
 
-class DetailPostView(DetailView):
+    def get_context_data(self, **kwargs):
+        '''Добавление лайкнутых постов в контекст один раз
+        для того чтобы не делать много запросов в БД'''
+        context = super().get_context_data(**kwargs)
+
+        if self.request.user.is_authenticated:
+            # получаем список ID всех лайкнутых постов
+            context['user_liked_posts_ids'] = models.Like.objects.filter(
+                user=self.request.user
+            ).values_list('post_id', flat=True)
+        return context
+
+class DetailPostView(DetailView): # убрать(заменил логику на то шо теперь это не нужно, а перекидывает на пост-лист с якорем)
     model = models.Post
     template_name = "posts/post-detail.html"
     context_object_name = "post_object"
@@ -92,3 +104,20 @@ class DeletePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView):
     template_name = "posts/post-delete-confirmation.html"
     success_url = reverse_lazy("post-list")
     context_object_name = "post_object"
+
+class PostLikeToggle(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        post = get_object_or_404(models.Post, pk=pk)
+        # Получаем тип действия из скрытого поля формы
+        action = request.POST.get('action', 'toggle')
+
+        if action == 'like_only':
+            # Только создаем, если его еще нет
+            models.Like.objects.get_or_create(post=post, user=request.user)
+        else:
+            # Обычный toggle для кнопки
+            like, created = models.Like.objects.get_or_create(post=post, user=request.user)
+            if not created:
+                like.delete()
+
+        return redirect(request.META.get('HTTP_REFERER', 'post-list'))
