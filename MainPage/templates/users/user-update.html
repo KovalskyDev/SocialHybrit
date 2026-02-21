@@ -22,20 +22,31 @@
                 <div class="col-12 col-md-9 p-4 p-md-5">
                     
                     <div class="d-flex align-items-center mb-5">
-                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-4 shadow-sm" 
-                             style="width: 45px; height: 45px; font-size: 1.2rem;">
-                            {{ cmuser_object.username|slice:":1"|upper }}
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-4 shadow-sm overflow-hidden" 
+                             style="width: 45px; height: 45px; font-size: 1.2rem; border: 1px solid #dbdbdb;">
+                            {% if cmuser_object.avatar %}
+                                <img src="{{ cmuser_object.avatar.url }}" id="avatar-display" class="w-100 h-100" style="object-fit: cover;">
+                            {% else %}
+                                <span id="avatar-letter">{{ cmuser_object.username|slice:":1"|upper }}</span>
+                            {% endif %}
                         </div>
                         <div>
                             <h5 class="m-0 fw-bold" style="font-size: 1.1rem;">{{ cmuser_object.username }}</h5>
-                            <a href="#" class="text-primary text-decoration-none fw-bold small">Змінити фото профілю</a>
+                            <label for="id_avatar" class="text-primary text-decoration-none fw-bold small" style="cursor: pointer;">
+                                Змінити фото профілю
+                            </label>
                         </div>
                     </div>
 
-                    <form method="POST" novalidate>
+                    <form method="POST" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
 
+                        <div class="d-none">
+                            <input type="file" name="avatar" id="id_avatar" accept="image/*">
+                        </div>
+
                         {% for field in form %}
+                            {% if field.name != 'avatar' %}
                             <div class="row mb-4 align-items-center">
                                 <label for="{{ field.id_for_label }}" class="col-sm-3 col-form-label text-sm-end fw-bold px-3" style="font-size: 0.9rem;">
                                     {{ field.label }}
@@ -64,6 +75,7 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% endif %}
                         {% endfor %}
 
                         <div class="row mt-5">
@@ -82,6 +94,30 @@
     </div>
 </div>
 
+<script>
+    // JS для мгновенного предпросмотра выбранной аватарки
+    document.getElementById('id_avatar').onchange = function (evt) {
+        const [file] = this.files;
+        if (file) {
+            let display = document.getElementById('avatar-display');
+            const letter = document.getElementById('avatar-letter');
+            const container = letter ? letter.parentElement : display.parentElement;
+
+            if (!display) {
+                // Если аватара не было (была буква), создаем тег img
+                if (letter) letter.remove();
+                display = document.createElement('img');
+                display.id = 'avatar-display';
+                display.className = 'w-100 h-100';
+                display.style.objectFit = 'cover';
+                container.appendChild(display);
+            }
+            
+            display.src = URL.createObjectURL(file);
+        }
+    }
+</script>
+
 <style>
     body { background-color: #fafafa !important; }
     
@@ -91,7 +127,6 @@
         box-shadow: none !important;
     }
 
-    /* Анимация (плавный въезд справа) */
     .card {
         animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }

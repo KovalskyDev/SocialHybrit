@@ -6,84 +6,124 @@
 <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6" style="max-width: 600px;">
         
-        <div class="d-flex justify-content-between align-items-center my-4">
+        <div class="d-flex justify-content-between align-items-center my-4 px-2 px-md-0">
             <h4 class="fw-bold m-0">Для вас</h4>
-            {% if user.is_authenticated %}
-                <a href="{% url 'post-create' %}" class="btn btn-dark btn-sm rounded-3 fw-bold">Створити пост</a>
-            {% else %}
-                <a href="{% url 'login' %}?next={% url 'post-create' %}" class="btn btn-primary btn-sm rounded-3 fw-bold">Створити пост</a>
-            {% endif %}
+            <a href="{% url 'post-create' %}" class="btn btn-dark btn-sm rounded-pill fw-bold px-3">Створити пост</a>
         </div>
 
         {% for post in posts_objects %}
-            <article class="card mb-4 border-1 border-light-subtle bg-white rounded-0">
-                <div class="card-header bg-white border-0 py-3 d-flex align-items-center">
-                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3 border" style="width: 38px; height: 38px;">
-                        <span class="small fw-bold">{{ post.creator.username|slice:":1"|upper }}</span>
+            <article class="card mb-4 border-1 border-light-subtle bg-white shadow-sm post-item">
+                
+                <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle overflow-hidden bg-light d-flex align-items-center justify-content-center me-3 border" style="width: 38px; height: 38px;">
+                            {% if post.creator.avatar %}
+                                <img src="{{ post.creator.avatar.url }}" class="w-100 h-100" style="object-fit: cover;">
+                            {% else %}
+                                <span class="small fw-bold text-secondary">{{ post.creator.username|slice:":1"|upper }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <a href="{% url 'user-detail' post.creator.pk %}" class="text-decoration-none text-dark fw-bold mb-0 d-block" style="font-size: 0.9rem;">
+                                {{ post.creator.username }}
+                            </a>
+                            <span class="text-muted" style="font-size: 0.7rem;">{{ post.created_at|date:"d M" }}</span>
+                        </div>
                     </div>
-                    <div>
-                        <a href="{% url 'user-detail' post.creator.pk %}" class="text-decoration-none text-dark fw-bold mb-0 d-block" style="font-size: 0.9rem;">
-                            {{ post.creator.username }}
-                        </a>
-                        <span class="text-muted" style="font-size: 0.75rem;">{{ post.created_at|date:"d M" }}</span>
-                    </div>
+                    <i class="bi bi-three-dots cursor-pointer"></i>
                 </div>
 
-                <div class="bg-light d-flex align-items-center justify-content-center border-top border-bottom" style="min-height: 300px; background: #fafafa !important;">
-                    <div class="p-4 text-center w-100">
-                        <h3 class="fw-bold post-title-display">{{ post.name }}</h3>
+                <div class="position-relative media-wrapper">
+                    <div class="media-container d-flex align-items-center justify-content-center overflow-hidden">
+                        {% if post.media %}
+                            {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
+                                <video src="{{ post.media.url }}" controls class="w-100 h-100" style="object-fit: cover;"></video>
+                            {% else %}
+                                <img src="{{ post.media.url }}" class="w-100 h-100" style="object-fit: cover;">
+                            {% endif %}
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                <h3 class="fw-bold post-title-display text-dark text-center px-4">{{ post.name }}</h3>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="like-heart-pop">
+                        <i class="bi bi-heart-fill text-white"></i>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <div class="d-flex gap-3 mb-3">
-                        <i class="bi bi-heart fs-4 cursor-pointer"></i>
-                        <i class="bi bi-chat fs-4 cursor-pointer"></i>
-                        <i class="bi bi-send fs-4 cursor-pointer"></i>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="d-flex gap-3">
+                            <i class="bi bi-heart fs-4 cursor-pointer hover-red"></i>
+                            <i class="bi bi-chat fs-4 cursor-pointer"></i>
+                            <i class="bi bi-send fs-4 cursor-pointer"></i>
+                        </div>
+                        <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
                     </div>
                     
-                    <p class="card-text mb-2" style="font-size: 0.9rem;">
+                    <p class="card-text mb-1" style="font-size: 0.95rem;">
                         <span class="fw-bold me-2">{{ post.creator.username }}</span>
-                        {{ post.about|truncatechars:150 }}
+                        <span class="post-caption text-dark">{{ post.about|truncatechars:120 }}</span>
                     </p>
                     
-                    <a href="{% url 'post-detail' post.pk %}" class="text-decoration-none text-muted small">
-                        Показати більше...
-                    </a>
+                    {% if post.about|length > 120 %}
+                        <a href="{% url 'post-detail' post.pk %}" class="text-decoration-none text-muted small">більше...</a>
+                    {% endif %}
                 </div>
             </article>
-        {% empty %}
-            <div class="text-center mt-5">
-                <p class="text-muted">Тут поки порожньо.</p>
-            </div>
         {% endfor %}
     </div>
 </div>
 
 <style>
     body { background-color: #fafafa !important; }
-    .card { border-radius: 8px !important; } /* Инста сейчас чуть скругляет углы в веб-версии */
-    .cursor-pointer { cursor: pointer; transition: opacity 0.2s; }
-    .cursor-pointer:hover { opacity: 0.6; }
+    .card { border-radius: 8px !important; overflow: hidden; border: 1px solid #dbdbdb !important; }
 
+    .media-container {
+        aspect-ratio: 1 / 1; /* Квадратность. Если хочешь оригинал — удали эту строку */
+        background-color: #f8f9fa;
+        width: 100%;
+        position: relative;
+    }
+
+    /* Анимация сердца (при dblclick) */
+    .like-heart-pop {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 80px;
+        z-index: 10;
+        pointer-events: none;
+        opacity: 0;
+    }
+    .like-heart-pop.animate {
+        animation: heartPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes heartPop {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+    }
+
+    .cursor-pointer:active { transform: scale(0.95); }
+    .hover-red:hover { color: #ed4956; }
+    
     .post-title-display {
-        /* Разрешает перенос длинных слов, чтобы они не вылезали за край */
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+        font-size: 1.5rem;
         word-break: break-word;
-        
-        /* Ограничиваем максимальное количество строк (например, до 3), 
-           если название слишком длинное — появится многоточие */
-        display: -webkit-box;
-        -webkit-line-clamp: 3; 
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        
-        /* Немного уменьшим шрифт, если букв много (опционально) */
-        font-size: calc(1.3rem + 0.3vw); 
-        padding: 0 10px;
-        margin: 0 auto;
-        max-width: 90%; /* Чтобы текст не прилипал к краям карточки */
     }
 </style>
-{% endblock content %}
+
+<script>
+    document.querySelectorAll('.media-wrapper').forEach(wrapper => {
+        wrapper.addEventListener('dblclick', function() {
+            const heart = this.querySelector('.like-heart-pop');
+            heart.classList.add('animate');
+            setTimeout(() => heart.classList.remove('animate'), 800);
+        });
+    });
+</script>
+{% endblock %}

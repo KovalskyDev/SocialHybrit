@@ -61,7 +61,7 @@ class UpdateCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = models.Post
     template_name = "posts/post-create.html"
-    form_class = forms.PostCreateForm
+    form_class = forms.PostForm
     success_url = reverse_lazy('post-list')
 
     def form_valid(self, form):
@@ -82,7 +82,7 @@ class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.Post
     template_name = "posts/post-update.html"
     context_object_name = "post_object"
-    form_class = forms.PostCreateForm
+    form_class = forms.PostForm
     
     def get_success_url(self):
         return reverse("post-detail", kwargs={"pk": self.object.pk})
