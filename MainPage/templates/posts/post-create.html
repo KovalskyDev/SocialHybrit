@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row justify-content-center mt-5">
     <div class="col-12 col-md-8 col-lg-6">
-        <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm create-post-card">
+        <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm create-post-card overflow-hidden">
             
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                 <a href="{% url 'post-list' %}" class="text-decoration-none text-dark small">Скасувати</a>
@@ -14,20 +14,35 @@
                     Поширити
                 </button>
             </div>
-            <form method="POST" id="post-form" novalidate>
+
+            <form method="POST" id="post-form" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 
                 <div class="card-body p-0">
+                    <div id="media-preview-container" class="bg-light border-bottom d-none">
+                        <div class="position-relative d-flex justify-content-center align-items-center" style="min-height: 200px; background-color: #000;">
+                            <img id="image-preview" class="w-100 d-none" style="max-height: 500px; object-fit: contain;">
+                            <video id="video-preview" class="w-100 d-none" controls style="max-height: 500px;"></video>
+                            <button type="button" id="remove-media" class="btn btn-dark btn-sm position-absolute top-0 end-0 m-2 opacity-75 rounded-circle">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 border-bottom d-flex align-items-center bg-white">
+                        <label for="id_media" class="btn btn-light border btn-sm fw-bold shadow-sm rounded-pill px-3">
+                            <i class="bi bi-camera-fill me-2"></i>Додати фото або відео
+                        </label>
+                        <input type="file" name="media" id="id_media" accept="image/*,video/*" class="d-none">
+                        <span id="file-name-hint" class="small text-muted ms-3">Файл не обрано</span>
+                    </div>
+
                     <div class="p-3 border-bottom bg-light-subtle">
                         <textarea name="name" maxlength="100" required id="id_name" 
                                 class="form-control border-0 shadow-none bg-transparent p-0 fw-bold auto-expand" 
                                 placeholder="Заголовок допису..." 
                                 style="font-size: 1.25rem; resize: none; overflow: hidden; min-height: 30px;"
                                 rows="1">{{ form.name.value|default:'' }}</textarea>
-                        
-                        {% if form.name.errors %}
-                            <div class="text-danger mt-1" style="font-size: 0.75rem;">{{ form.name.errors|first }}</div>
-                        {% endif %}
                     </div>
 
                     <div class="p-3">
@@ -36,14 +51,14 @@
                                 placeholder="Напишіть щось цікаве..." 
                                 style="resize: none; overflow: hidden; font-size: 1rem; min-height: 150px;"
                                 rows="1">{{ form.about.value|default:'' }}</textarea>
-                        <div class="text-end mt-1">
-                            <span id="char-count" class="text-muted" style="font-size: 0.75rem;">0</span>
-                            <span class="text-muted" style="font-size: 0.75rem;"> / 2200</span>
-                        </div>
                         
-                        {% if form.about.errors %}
-                            <div class="text-danger mt-1" style="font-size: 0.75rem;">{{ form.about.errors|first }}</div>
-                        {% endif %}
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <div id="media-error" class="text-danger small"></div>
+                            <div class="text-end">
+                                <span id="char-count" class="text-muted" style="font-size: 0.75rem;">0</span>
+                                <span class="text-muted" style="font-size: 0.75rem;"> / 2200</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -54,6 +69,7 @@
                 const charCount = document.getElementById('char-count');
                 const MAX_CHARS = 2200;
 
+                // 1. Авто-высота
                 const adjustHeight = (el) => {
                     el.style.height = 'auto';
                     el.style.height = el.scrollHeight + 'px';
@@ -64,67 +80,67 @@
                     adjustHeight(field);
                 });
 
-                const handleAboutInput = (e) => {
-                    // Проверяем: если длина уже превышена, только тогда обрезаем
-                    // Это предотвратит прыжки курсора при обычном наборе текста
+                // 2. Лимит символов
+                const handleAboutInput = () => {
                     if (textareaAbout.value.length > MAX_CHARS) {
-                        const start = textareaAbout.selectionStart; // Запоминаем где был курсор
+                        const start = textareaAbout.selectionStart;
                         const end = textareaAbout.selectionEnd;
-                        
                         textareaAbout.value = textareaAbout.value.substring(0, MAX_CHARS);
-                        
-                        // Возвращаем курсор на место, чтобы не прыгало
                         textareaAbout.setSelectionRange(start, end);
                     }
-
                     const currentLength = textareaAbout.value.length;
                     charCount.textContent = currentLength;
-
-                    if (currentLength >= 2100) {
-                        charCount.classList.remove('text-muted');
-                        charCount.classList.add('text-danger');
-                    } else {
-                        charCount.classList.remove('text-danger');
-                        charCount.classList.add('text-muted');
-                    }
+                    charCount.className = currentLength >= 2100 ? 'text-danger' : 'text-muted';
                 };
 
                 textareaAbout.addEventListener('input', handleAboutInput);
                 handleAboutInput();
+
+                // 3. Предпросмотр Медиа
+                const mediaInput = document.getElementById('id_media');
+                const previewContainer = document.getElementById('media-preview-container');
+                const imgPreview = document.getElementById('image-preview');
+                const videoPreview = document.getElementById('video-preview');
+                const removeMediaBtn = document.getElementById('remove-media');
+                const fileNameHint = document.getElementById('file-name-hint');
+
+                mediaInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        const isVideo = file.type.startsWith('video/');
+                        
+                        fileNameHint.textContent = file.name;
+                        previewContainer.classList.remove('d-none');
+                        
+                        if (isVideo) {
+                            imgPreview.classList.add('d-none');
+                            videoPreview.classList.remove('d-none');
+                            videoPreview.src = URL.createObjectURL(file);
+                        } else {
+                            videoPreview.classList.add('d-none');
+                            imgPreview.classList.remove('d-none');
+                            imgPreview.src = URL.createObjectURL(file);
+                        }
+                    }
+                });
+
+                removeMediaBtn.addEventListener('click', () => {
+                    mediaInput.value = '';
+                    fileNameHint.textContent = 'Файл не обрано';
+                    previewContainer.classList.add('d-none');
+                    imgPreview.src = '';
+                    videoPreview.src = '';
+                });
             </script>
         </div>
-
-        <p class="text-center text-muted mt-4" style="font-size: 0.8rem;">
-            Порада: робіть заголовки влучними, щоб залучити більше читачів!
-        </p>
     </div>
 </div>
 
 <style>
     body { background-color: #fafafa !important; }
-
-    /* Убираем все рамки при фокусе, чтобы был эффект "чистого листа" */
-    .form-control:focus {
-        background-color: transparent !important;
-        box-shadow: none !important;
-    }
-
-    /* Анимация "вырастания" карточки */
-    .create-post-card {
-        animation: postPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes postPop {
-        from { opacity: 0; transform: scale(0.9); }
-        to { opacity: 1; transform: scale(1); }
-    }
-
-    /* Эффект для кнопки "Поширити" */
-    .btn-link {
-        transition: opacity 0.2s;
-    }
-    .btn-link:hover {
-        opacity: 0.7;
-    }
+    .form-control:focus { background-color: transparent !important; box-shadow: none !important; }
+    .create-post-card { animation: postPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes postPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 </style>
 {% endblock %}

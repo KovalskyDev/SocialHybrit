@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Профіль Користувача{% endblock %}
+{% block title %}Профіль Користувача | {{ cmuser_object.username }}{% endblock %}
 
 {% block content %}
 <div class="row mt-4 justify-content-center">
@@ -8,9 +8,13 @@
         
         <div class="row mb-5 align-items-center">
             <div class="col-4 col-md-3 text-center">
-                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center shadow-sm" 
+                <div class="rounded-circle overflow-hidden bg-secondary text-white d-inline-flex align-items-center justify-content-center shadow-sm border" 
                      style="width: clamp(80px, 15vw, 150px); height: clamp(80px, 15vw, 150px); font-size: 3rem;">
-                    {{ cmuser_object.username|slice:":1"|upper }}
+                    {% if cmuser_object.avatar %}
+                        <img src="{{ cmuser_object.avatar.url }}" alt="{{ cmuser_object.username }}" class="w-100 h-100" style="object-fit: cover;">
+                    {% else %}
+                        {{ cmuser_object.username|slice:":1"|upper }}
+                    {% endif %}
                 </div>
             </div>
             
@@ -19,7 +23,7 @@
                     <h2 class="fw-light me-4 mb-2 mb-md-0">{{ cmuser_object.username }}</h2>
                     
                     {% if user.is_authenticated %}
-                        {% if cmuser_object.pk == user.pk%}
+                        {% if cmuser_object.pk == user.pk %}
                             <div class="d-flex gap-2">
                                 <a href="{% url 'user-update' cmuser_object.pk %}" class="btn btn-sm btn-outline-dark fw-bold px-3">Редагувати профіль</a>
                                 <a href="{% url 'user-delete' cmuser_object.pk %}" class="btn btn-sm btn-outline-danger">
@@ -55,15 +59,28 @@
         <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
             {% for post in cmuser_object.posts.all %}
                 <div class="col">
-                    <div class="card h-100 shadow-sm border-0 position-relative post-card">
+                    <div class="card h-100 shadow-sm border-0 position-relative post-card overflow-hidden">
+                        
+                        {% if post.media %}
+                        <div style="height: 150px; overflow: hidden; background: #000;">
+                            {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white bg-dark">
+                                    <i class="bi bi-play-circle fs-1"></i>
+                                </div>
+                            {% else %}
+                                <img src="{{ post.media.url }}" class="card-img-top w-100 h-100" style="object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold text-truncate">{{ post.name }}</h5>
+                            <h5 class="card-title fw-bold text-truncate" style="font-size: 1rem;">{{ post.name }}</h5>
                             <p class="card-text text-muted small flex-grow-1">
-                                {{ post.about|truncatechars:100 }}
+                                {{ post.about|truncatechars:60 }}
                             </p>
                             <div class="mt-2 d-flex justify-content-between align-items-center">
                                 <span class="text-secondary" style="font-size: 0.7rem;">{{ post.created_at|date:"d.m.Y" }}</span>
-                                <a href="{% url 'post-detail' post.pk %}" class="stretched-link text-decoration-none text-primary fw-bold small">Читати далі</a>
+                                <a href="{% url 'post-detail' post.pk %}" class="stretched-link text-decoration-none text-primary fw-bold small">Переглянути</a>
                             </div>
                         </div>
                     </div>
@@ -78,4 +95,14 @@
 
     </div>
 </div>
+
+<style>
+    /* Эффект при наведении на карточку в профиле */
+    .post-card {
+        transition: transform 0.2s;
+    }
+    .post-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
 {% endblock content %}

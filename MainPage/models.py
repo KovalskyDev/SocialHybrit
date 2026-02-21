@@ -20,6 +20,7 @@ class CustomUser(AbstractUser):
 
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=30, choices=GENDER_CHOICES, null=True, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default=ROLE_USER)
 
     class Meta:
@@ -55,6 +56,7 @@ class CustomUser(AbstractUser):
 class Post(models.Model):
     name = models.CharField(max_length=100)
     about = models.TextField(max_length=2200)
+    media = models.FileField(upload_to="post_media/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="posts")
 
@@ -81,4 +83,4 @@ class Post(models.Model):
             return True
             
         return False
-        
+    

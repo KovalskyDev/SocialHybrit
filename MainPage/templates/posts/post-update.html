@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Редагувати Поста{% endblock %}
+{% block title %}Редагувати Допис{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-5">
     <div class="col-12 col-md-8 col-lg-6">
         
-        <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm update-post-card">
+        <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm update-post-card overflow-hidden">
             
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                 <a href="{% url 'post-detail' post_object.pk %}" class="text-decoration-none text-dark small">Скасувати</a>
@@ -16,10 +16,37 @@
                 </button>
             </div>
 
-            <form method="POST" id="update-post-form" novalidate>
+            <form method="POST" id="update-post-form" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 
                 <div class="card-body p-0">
+                    <div id="media-preview-container" class="bg-black d-flex align-items-center justify-content-center {% if not post_object.media %}d-none{% endif %}" style="min-height: 300px;">
+                        <div class="position-relative w-100 text-center">
+                            {% if post_object.media %}
+                                {% if post_object.media.url|lower|slice:"-4:" == ".mp4" or post_object.media.url|lower|slice:"-4:" == ".mov" %}
+                                    <video id="video-preview" src="{{ post_object.media.url }}" controls class="w-100" style="max-height: 500px;"></video>
+                                    <img id="image-preview" class="w-100 d-none" style="max-height: 500px; object-fit: contain;">
+                                {% else %}
+                                    <img id="image-preview" src="{{ post_object.media.url }}" class="w-100" style="max-height: 500px; object-fit: contain;">
+                                    <video id="video-preview" class="w-100 d-none" controls style="max-height: 500px;"></video>
+                                {% endif %}
+                            {% else %}
+                                <img id="image-preview" class="w-100 d-none" style="max-height: 500px; object-fit: contain;">
+                                <video id="video-preview" class="w-100 d-none" controls style="max-height: 500px;"></video>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="p-3 border-bottom d-flex align-items-center bg-white">
+                        <label for="id_media" class="btn btn-light border btn-sm fw-bold shadow-sm rounded-pill px-3">
+                            <i class="bi bi-arrow-repeat me-2"></i>Змінити фото або відео
+                        </label>
+                        <input type="file" name="media" id="id_media" accept="image/*,video/*" class="d-none">
+                        <span id="file-name-hint" class="small text-muted ms-3">
+                            {% if post_object.media %}Файл завантажено{% else %}Файл не обрано{% endif %}
+                        </span>
+                    </div>
+
                     <div class="p-3 border-bottom bg-light-subtle bg-opacity-10">
                         <label class="text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05rem; text-transform: uppercase;">Заголовок</label>
                         <textarea name="name" maxlength="100" required id="id_name" 
@@ -53,7 +80,7 @@
             </form>
         </div>
 
-        <div class="text-center mt-4">
+        <div class="text-center mt-4 mb-5">
             <p class="text-muted small">
                 Створено: {{ post_object.created_at|date:"d.m.Y H:i" }}
             </p>
@@ -67,6 +94,7 @@
     const charCount = document.getElementById('char-count');
     const MAX_CHARS = 2200;
 
+    // Авто-высота
     const adjustHeight = (el) => {
         el.style.height = 'auto';
         el.style.height = el.scrollHeight + 'px';
@@ -77,53 +105,50 @@
         adjustHeight(field);
     });
 
-    const handleAboutInput = (e) => {
-        // Проверяем: если длина уже превышена, только тогда обрезаем
-        // Это предотвратит прыжки курсора при обычном наборе текста
+    // Лимит символов
+    const handleAboutInput = () => {
         if (textareaAbout.value.length > MAX_CHARS) {
-            const start = textareaAbout.selectionStart; // Запоминаем где был курсор
-            const end = textareaAbout.selectionEnd;
-            
             textareaAbout.value = textareaAbout.value.substring(0, MAX_CHARS);
-            
-            // Возвращаем курсор на место, чтобы не прыгало
-            textareaAbout.setSelectionRange(start, end);
         }
-
         const currentLength = textareaAbout.value.length;
         charCount.textContent = currentLength;
-
-        if (currentLength >= 2100) {
-            charCount.classList.remove('text-muted');
-            charCount.classList.add('text-danger');
-        } else {
-            charCount.classList.remove('text-danger');
-            charCount.classList.add('text-muted');
-        }
+        charCount.className = currentLength >= 2100 ? 'text-danger' : 'text-muted';
     };
 
     textareaAbout.addEventListener('input', handleAboutInput);
     handleAboutInput();
+
+    // Предпросмотр нового медиа
+    const mediaInput = document.getElementById('id_media');
+    const previewContainer = document.getElementById('media-preview-container');
+    const imgPreview = document.getElementById('image-preview');
+    const videoPreview = document.getElementById('video-preview');
+    const fileNameHint = document.getElementById('file-name-hint');
+
+    mediaInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const isVideo = file.type.startsWith('video/');
+            fileNameHint.textContent = file.name;
+            previewContainer.classList.remove('d-none');
+            
+            if (isVideo) {
+                imgPreview.classList.add('d-none');
+                videoPreview.classList.remove('d-none');
+                videoPreview.src = URL.createObjectURL(file);
+            } else {
+                videoPreview.classList.add('d-none');
+                imgPreview.classList.remove('d-none');
+                imgPreview.src = URL.createObjectURL(file);
+            }
+        }
+    });
 </script>
 
 <style>
     body { background-color: #fafafa !important; }
-
-    .form-control:focus {
-        background-color: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .update-post-card {
-        animation: slideUpFade 0.5s ease-out;
-    }
-
-    @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .btn-link { transition: opacity 0.2s, transform 0.1s; }
-    .btn-link:active { transform: scale(0.95); }
+    .form-control:focus { background-color: transparent !important; box-shadow: none !important; }
+    .update-post-card { animation: slideUpFade 0.5s ease-out; }
+    @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 {% endblock %}

@@ -4,4 +4,5 @@ my_venv
 __pycache__/
 .env
 .vscode/
-.DS_Store   
+.DS_Store
+media/

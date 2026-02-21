@@ -1,7 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'post-list' %}">
-            Social<span class="text-primary">Hybrit</span>
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'post-list' %}">
+            <div class="hybrid-logo-v3 me-2">
+                <span>SH</span>
+            </div>
+            <span class="hybrid-text-v3">Social Hybrit</span>
         </a>
         
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -11,21 +16,79 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav ms-auto align-items-center">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'user-detail' user.pk %}" class="nav-link d-flex align-items-center me-3">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px; font-size: 0.8rem;">
-                            {{ user.username|slice:":1"|upper }}
+                    <a href="{% url 'user-detail' user.pk %}" class="nav-link d-flex align-items-center me-3 p-0">
+                        <div class="user-avatar-v3">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-light" style="width: 32px; height: 32px;">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" class="w-100 h-100" style="object-fit: cover;">
+                                {% else %}
+                                    <span class="fw-bold text-muted" style="font-size: 0.7rem;">{{ user.username|slice:":1"|upper }}</span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <span class="fw-bold small">{{ user.username }}</span>
+                        <span class="fw-bold small text-dark d-none d-sm-inline ms-2">{{ user.username }}</span>
                     </a>
                     <form action="{% url 'logout' %}" method="post" class="m-0">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Вийти</button>
+                        <button type="submit" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold" style="font-size: 0.75rem;">Вийти</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary rounded-pill me-2">Увійти</a>
-                    <a href="{% url 'register' %}" class="btn btn-sm btn-primary rounded-pill">Реєстрація</a>
+                    <a href="{% url 'login' %}" class="btn btn-sm btn-link text-decoration-none text-dark fw-bold me-2">Увійти</a>
+                    <a href="{% url 'register' %}" class="btn btn-sm btn-dark rounded-pill px-4 fw-bold shadow-sm">Реєстрація</a>
                 {% endif %}
             </div>
         </div>
     </div>
 </nav>
+
+<style>
+    /* Градиент "Supernova" - уходим от монотонности */
+    :root {
+        --hybrid-grad: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
+    }
+
+    .hybrid-logo-v3 {
+        width: 35px;
+        height: 35px;
+        background: var(--hybrid-grad);
+        border-radius: 8px; /* Вернула легкий квадратный изгиб, он солиднее */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .hybrid-text-v3 {
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.7rem;
+        background: linear-gradient(to bottom, #1a1a1a, #444);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+
+    /* Рамка аватарки плотно прилегает к фото */
+    .user-avatar-v3 {
+        padding: 2px; /* Толщина рамки */
+        background: var(--hybrid-grad);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.1s ease;
+    }
+
+    .user-avatar-v3:hover {
+        transform: scale(0.95);
+    }
+
+    .btn-dark {
+        background-color: #1a1a1a;
+        border: none;
+    }
+</style>
