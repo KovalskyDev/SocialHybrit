@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (ListPostView, CreatePostView, DetailPostView, DeletePostView, UpdatePostView, 
                     CustomLoginView, CustomLogoutView, CustomRegisterView,
-                    UpdateCustomUserView, DeleteCustomUserView, DetailCustomUserView)
+                    UpdateCustomUserView, DeleteCustomUserView, DetailCustomUserView,
+                    PostLikeToggle)
 urlpatterns = [
     path("login/", CustomLoginView.as_view(), name="login"),
     path("register/", CustomRegisterView.as_view(), name="register"),
@@ -12,6 +13,7 @@ urlpatterns = [
     path("posts/<int:pk>/", DetailPostView.as_view(), name="post-detail"),
     path("posts/<int:pk>/update/", UpdatePostView.as_view(), name="post-update"),
     path("posts/<int:pk>/delete/", DeletePostView.as_view(), name="post-delete"),
+    path("posts/like/<int:pk>/", PostLikeToggle.as_view(), name="post-like"),
 
     path("users/<int:pk>/", DetailCustomUserView.as_view(), name="user-detail"),
     path("users/<int:pk>/delete/", DeleteCustomUserView.as_view(), name="user-delete"),
