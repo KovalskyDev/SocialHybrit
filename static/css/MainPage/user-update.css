@@ -1,0 +1,56 @@
+body { background-color: #fafafa !important; }
+
+.form-control:focus, .form-select:focus {
+    background-color: #fff !important;
+    border-color: #dbdbdb !important;
+    box-shadow: none !important;
+}
+
+.card {
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.btn-update-profile:active {
+    transform: scale(0.96);
+}
+
+.toggle-password {
+            right: 15px;
+            top: 10px;
+            z-index: 10;
+            cursor: pointer;
+            color: #8e8e8e;
+            transition: color 0.2s;
+}
+.toggle-password:hover {
+    color: #262626;
+}
+
+.password-wrapper {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+    
+/* Сама иконка */
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    /* Высчитываем высоту, чтобы глаз был по центру инпута (ок. 40px) */
+    top: 20px; 
+    transform: translateY(-50%);
+    z-index: 10;
+    cursor: pointer;
+    color: #8e8e8e;
+    background: transparent;
+    padding: 0 5px;
+}
+
+.toggle-password:hover {
+    color: #262626;
+}

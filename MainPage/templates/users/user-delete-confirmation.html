@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/user-delete-confirmation.css' %}">{% endblock extra_css %}
+
 {% block title %}Видалення акаунту{% endblock %}
 
 {% block content %}
@@ -37,35 +41,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    body { background-color: #fafafa !important; }
-
-    /* Анимация: карточка "всплывает" и немного дрожит при появлении */
-    .user-delete-card {
-        animation: shakeIn 0.5s cubic-bezier(.36,.07,.19,.97) both;
-    }
-
-    @keyframes shakeIn {
-        0% { opacity: 0; transform: translateY(30px); }
-        20%, 40%, 60%, 80% { transform: translateX(-2px); }
-        30%, 50%, 70% { transform: translateX(2px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Эффект на опасную кнопку */
-    .btn-delete-confirm {
-        transition: all 0.2s ease;
-    }
-    .btn-delete-confirm:hover {
-        background-color: #dc3545 !important;
-        filter: brightness(0.9);
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
-    }
-
-    .btn-light:hover {
-        background-color: #e9ecef !important;
-        color: #212529 !important;
-    }
-</style>
 {% endblock content %}

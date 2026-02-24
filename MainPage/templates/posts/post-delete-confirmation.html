@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+{% load static %}
+{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/post-delete-confirmation.css' %}">{% endblock extra_css %}
+
 {% block title %}Видалити допис{% endblock %}
 
 {% block content %}
@@ -41,30 +44,4 @@
     </div>
 </div>
 
-<style>
-    body { background-color: rgba(0,0,0,0.05) !important; }
-
-    /* Центрированная карточка с анимацией "встряхивания" или мягкого появления */
-    .delete-card {
-        animation: modalShow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes modalShow {
-        from { opacity: 0; transform: scale(0.9); }
-        to { opacity: 1; transform: scale(1); }
-    }
-
-    /* Ховер на опасную кнопку */
-    .delete-btn-hover {
-        transition: background-color 0.2s;
-    }
-    .delete-btn-hover:hover {
-        background-color: #fff1f1 !important;
-    }
-
-    /* Убираем лишние рамки у ссылок-кнопок */
-    .btn-link:focus {
-        box-shadow: none;
-    }
-</style>
 {% endblock content %}
