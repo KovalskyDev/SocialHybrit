@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/post-list.css' %}">{% endblock extra_css %}
 
 {% block title %}Стрічка{% endblock %}
 
@@ -32,7 +35,19 @@
                             <span class="text-muted" style="font-size: 0.7rem;">{{ post.created_at|date:"d M" }}</span>
                         </div>
                     </div>
+
+                    {% if post.creator == user %}
+                    <div class="dropdown">
+                        <i class="bi bi-three-dots cursor-pointer" data-bs-toggle="dropdown"></i>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 border-1 border-light">
+                            <li><a class="dropdown-item small fw-bold" href="{% url 'post-update' post.pk %}"><i class="bi bi-pencil me-2"></i>Редагувати</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item small fw-bold text-danger" href="{% url 'post-delete' post.pk %}"><i class="bi bi-trash me-2"></i>Видалити</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
                     <i class="bi bi-three-dots cursor-pointer"></i>
+                    {% endif %}
                 </div>
 
                 <div class="position-relative media-wrapper">
@@ -43,163 +58,106 @@
                             {% else %}
                                 <img src="{{ post.media.url }}" class="w-100 h-100" style="object-fit: cover;" draggable="false">
                             {% endif %}
+                            
+                            <div class="post-title-overlay">
+                                <h5 class="m-0 text-white fw-bold small px-3 py-2">{{ post.name }}</h5>
+                            </div>
                         {% else %}
                             <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
                                 <h3 class="fw-bold post-title-display text-dark text-center px-4">{{ post.name }}</h3>
                             </div>
                         {% endif %}
                     </div>
-
                     <div class="like-heart-pop">
                         <i class="bi bi-heart-fill"></i>
                     </div>
                 </div>
 
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
+                <div class="card-body px-0 pb-0"> 
+                    <div class="d-flex justify-content-between mb-2 px-3">
                         <div class="d-flex gap-3 align-items-center">
-                            <form action="{% url 'post-like' post.pk %}" method="post" class="m-0 like-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" class="like-action-input" value="toggle">
-                                <button type="submit" class="btn p-0 border-0 shadow-none">
-                                    {% if post.pk in user_liked_posts_ids %}
-                                        <i class="bi bi-heart-fill fs-4 text-danger"></i>
-                                    {% else %}
-                                        <i class="bi bi-heart fs-4 hover-red"></i>
-                                    {% endif %}
+                            <div class="d-flex align-items-center gap-1">
+                                <form action="{% url 'post-like' post.pk %}" method="post" class="m-0 like-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" class="like-action-input" value="toggle">
+                                    <button type="submit" class="btn p-0 border-0 shadow-none d-flex align-items-center">
+                                        {% if post.pk in user_liked_posts_ids %}
+                                            <i class="bi bi-heart-fill fs-4 text-danger"></i>
+                                        {% else %}
+                                            <i class="bi bi-heart fs-4 hover-red"></i>
+                                        {% endif %}
+                                    </button>
+                                </form> 
+                                <span class="fw-bold small">{{ post.likes_count }}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-1">
+                                <button class="btn p-0 border-0 shadow-none d-flex align-items-center" onclick="toggleComments('{{ post.pk }}')">
+                                    <i class="bi bi-chat fs-4 hover-blue"></i>
                                 </button>
-                            </form>
-                            <a href="{% url 'post-detail' post.pk %}" class="text-dark"><i class="bi bi-chat fs-4"></i></a>
+                                <span class="fw-bold small">{{ post.replies.count }}</span>
+                            </div>
+
                             <i class="bi bi-send fs-4 cursor-pointer"></i>
                         </div>
                         <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
                     </div>
                     
-                    <p class="fw-bold mb-1" style="font-size: 0.9rem;">
-                        {{ post.likes_count }} вподобань
-                    </p>
+                    <div class="post-text-container px-3 pb-3" style="font-size: 0.95rem; text-align: left;">
+                        <span class="fw-bold me-1">{{ post.creator.username }}</span><span class="post-caption text-dark">
+                            <span class="about-short">
+                                {{ post.about|truncatechars:100 }}
+                                {% if post.about|length > 100 %}
+                                    <button class="btn btn-link p-0 border-0 m-0 read-more-btn">ще</button>
+                                {% endif %}
+                            </span>
 
-                    <p class="card-text mb-1" style="font-size: 0.95rem;">
-                        <span class="fw-bold me-2">{{ post.creator.username }}</span>
-                        <span class="post-caption text-dark">{{ post.about|truncatechars:120 }}</span>
-                    </p>
+                            {% if post.about|length > 100 %}
+                                <span class="about-full d-none">
+                                    {{ post.about }}
+                                    <button class="btn btn-link p-0 border-0 m-0 read-less-btn">приховати</button>
+                                </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div id="comments-section-{{ post.pk }}" class="post-comments-section border-top" style="display: none; background-color: #fdfdfd;">
+                    <div class="replies-list px-3 pt-3">
+                        {% for reply in post.replies.all %}
+                            <div class="reply-item d-flex justify-content-between align-items-start mb-2">
+                                <div style="min-width: 0;">
+                                    <a href="{% url 'user-detail' reply.user.pk %}" style="text-decoration: none; color: inherit;"><span class="fw-bold me-2 small">{{ reply.user.username }}</span></a>
+                                    <span class="text-dark small reply-text">{{ reply.text }}</span>
+                                </div>
+                                {% if reply.user == user or post.creator == user or user.is_admin %}
+                                    <a href="{% url 'delete_reply' reply.pk %}" class="text-muted ms-2 no-select" onclick="return confirm('Видалити цей коментар?')">
+                                        <i class="bi bi-x small"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p class="small text-muted text-center py-2">Ще немає коментарів...</p>
+                        {% endfor %}
+                    </div>
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'add_reply' post.pk %}" method="post" class="p-2 border-top">
+                        {% csrf_token %}
+                        <div class="input-group align-items-end"> <textarea name="text" maxlength="500" 
+                                    class="form-control border-0 shadow-none bg-transparent comment-textarea" 
+                                    placeholder="Додати коментар..." 
+                                    rows="1" 
+                                    required 
+                                    style="resize: none; max-height: 150px; overflow-y: hidden;"></textarea>
+                            <button class="btn btn-link text-primary fw-bold text-decoration-none pb-1" type="submit">ОК</button>
+                        </div>
+                    </form>
+                    {% endif %}
                 </div>
             </article>
         {% endfor %}
     </div>
 </div>
 
-<style>
-    body { background-color: #fafafa !important; }
-    
-    .post-title-display {
-    word-break: break-word; /* Режет только если не лезет целиком */
-    overflow-wrap: break-word;
-    display: block;
-    width: 100%;
-    line-height: 1.2;
-    }
-
-    /* 1. Запрещаем выделение ВСЕЙ карточке */
-    .post-item { 
-        border-radius: 8px !important; 
-        overflow: hidden; 
-        border: 1px solid #dbdbdb !important;
-        -webkit-user-select: none;
-        user-select: none;
-    }
-
-    /* 2. Разрешаем выделение ТОЛЬКО дескрипшену */
-    .post-caption {
-        -webkit-user-select: text;
-        user-select: text;
-        cursor: text;
-
-        word-break: break-word; 
-        overflow-wrap: break-word;
-        display: inline-block; /* Чтобы корректно считалась ширина строки */
-        max-width: 100%;
-    }
-
-    .user-avatar-v3 {
-        padding: 2px;
-        background: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center; justify-content: center;
-    }
-
-    .media-container {
-        aspect-ratio: 1 / 1;
-        background-color: #f8f9fa;
-        width: 100%;
-        position: relative;
-    }
-
-    /* Убираем выделение при тапах на мобилках */
-    .btn, .cursor-pointer, i {
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    .like-heart-pop {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        font-size: 100px;
-        z-index: 10;
-        pointer-events: none;
-        opacity: 0;
-        color: #ff3040;
-        filter: drop-shadow(0 0 15px rgba(255, 48, 64, 0.4));
-    }
-
-    .like-heart-pop.animate {
-        animation: heartPop 0.8s ease-out;
-    }
-
-    @keyframes heartPop {
-        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-        15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-        30% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; }
-        45% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        80% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; }
-        100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
-    }
-
-    .hover-red:hover { color: #ed4956; }
-    .text-danger { color: #ff3040 !important; }
-
-    .post-item:target {
-    border: 2px solid #0095f6 !important; /* Подсветит пост, если на него перешли из профиля */
-    scroll-margin-top: 80px; /* Чтобы пост не прятался под навигацией при скролле */
-    }
-
-    html {
-        scroll-behavior: smooth; /* Плавная прокрутка */
-    }
-</style>
-
-<script>
-    document.querySelectorAll('.media-wrapper').forEach(wrapper => {
-        wrapper.addEventListener('dblclick', function(e) {
-            // Предотвращаем стандартное выделение браузера при быстром клике
-            e.preventDefault();
-
-            const heart = this.querySelector('.like-heart-pop');
-            heart.classList.remove('animate');
-            void heart.offsetWidth;
-            heart.classList.add('animate');
-            
-            const card = this.closest('.card');
-            const likeForm = card.querySelector('.like-form');
-            const actionInput = likeForm.querySelector('.like-action-input');
-            
-            actionInput.value = 'like_only';
-            
-            setTimeout(() => {
-                likeForm.submit();
-            }, 400);
-        });
-    });
-</script>
-{% endblock %}
+{% block extra_js %}<script src="{% static 'js/MainPage/post-list.js' %}"></script>{% endblock extra_js%}
+{% endblock content %}

@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/user-detail.css' %}">{% endblock extra_css %}
+
 {% block title %}Профіль Користувача | {{ cmuser_object.username }}{% endblock %}
 
 {% block content %}
@@ -84,7 +88,7 @@
                             <div class="post-grid-overlay">
                                 <div class="d-flex gap-3">
                                     <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
-                                    <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> 0</span>
+                                    <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
                                 </div>
                             </div>
                         </div>
@@ -99,103 +103,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Аватар з твоїм фірмовим градієнтом */
-    .user-avatar-v3 {
-        background: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
-        border-radius: 50%;
-    }
-
-    /* Картка поста */
-    .post-grid-item {
-        display: block;
-        position: relative;
-        text-decoration: none;
-        border-radius: 20px; 
-        overflow: hidden;
-        aspect-ratio: 1 / 1;
-        background: #f8f9fa;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    .post-grid-content {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
-
-    .grid-media {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.5s ease;
-    }
-
-    /* Градієнт для текстових постів */
-    .bg-custom-gradient {
-        background: linear-gradient(135deg, #8a2be2 0%, #00d2ff 100%);
-    }
-
-    /* Текст у сітці */
-    .post-grid-text {
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-height: 1.2;
-    }
-
-    /* Бейдж для відео */
-    .video-icon-badge {
-        position: absolute;
-        top: 12px; right: 12px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(5px);
-        width: 30px; height: 30px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 10px;
-        color: white;
-        z-index: 2;
-        border: 1px solid rgba(255,255,255,0.3);
-    }
-
-    /* Оверлей при наведенні (з блюром) */
-    .post-grid-overlay {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(2px);
-        display: flex; align-items: center; justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 3;
-    }
-
-    /* Ховер ефекти */
-    .post-grid-item:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
-    }
-
-    .post-grid-item:hover .post-grid-overlay {
-        opacity: 1;
-    }
-
-    .post-grid-item:hover .grid-media {
-        transform: scale(1.1);
-    }
-
-    /* Навігація табів */
-    .nav-tabs .nav-link.active {
-        border-top: 2px solid #212529 !important;
-    }
-
-    @media (max-width: 576px) {
-        .post-grid-item { border-radius: 12px; }
-    }
-</style>
 {% endblock content %}

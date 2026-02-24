@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Редагувати Допис{% endblock %}
 
@@ -9,7 +10,7 @@
         <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm update-post-card overflow-hidden">
             
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <a href="{% url 'post-detail' post_object.pk %}" class="text-decoration-none text-dark small">Скасувати</a>
+                <a href="{% url 'post-list' %}#post-{{ post_object.pk }}" class="text-decoration-none text-dark small">Скасувати</a>
                 <h6 class="m-0 fw-bold text-secondary">Редагувати допис</h6>
                 <button type="submit" form="update-post-form" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">
                     Зберегти
@@ -37,12 +38,22 @@
                         </div>
                     </div>
 
-                    <div class="p-3 border-bottom d-flex align-items-center bg-white">
-                        <label for="id_media" class="btn btn-light border btn-sm fw-bold shadow-sm rounded-pill px-3">
-                            <i class="bi bi-arrow-repeat me-2"></i>Змінити фото або відео
+                    <div class="p-3 border-bottom d-flex align-items-center bg-white flex-wrap gap-2">
+                        <label for="id_media" id="media-label" class="btn btn-light border btn-sm fw-bold shadow-sm rounded-pill px-3">
+                            <i class="bi {% if post_object.media %}bi-arrow-repeat{% else %}bi-plus-lg{% endif %} me-2" id="label-icon"></i>
+                            <span id="label-text">
+                                {% if post_object.media %}Змінити{% else %}Додати{% endif %}
+                            </span>
                         </label>
                         <input type="file" name="media" id="id_media" accept="image/*,video/*" class="d-none">
-                        <span id="file-name-hint" class="small text-muted ms-3">
+                        
+                        <button type="button" id="delete-media-btn" class="btn btn-outline-danger btn-sm rounded-pill px-3 {% if not post_object.media %}d-none{% endif %}">
+                            <i class="bi bi-trash me-1"></i>Видалити фото/відео
+                        </button>
+
+                        <input type="checkbox" name="media-clear" id="media-clear_id" class="d-none">
+
+                        <span id="file-name-hint" class="small text-muted ms-md-auto w-100 w-md-auto mt-2 mt-md-0">
                             {% if post_object.media %}Файл завантажено{% else %}Файл не обрано{% endif %}
                         </span>
                     </div>
@@ -54,10 +65,6 @@
                                   placeholder="Назва допису..." 
                                   style="font-size: 1.25rem; resize: none; overflow: hidden; min-height: 30px;"
                                   rows="1">{{ form.name.value|default:post_object.name }}</textarea>
-                        
-                        {% if form.name.errors %}
-                            <div class="text-danger mt-1" style="font-size: 0.75rem;">{{ form.name.errors|first }}</div>
-                        {% endif %}
                     </div>
 
                     <div class="p-3">
@@ -71,79 +78,12 @@
                             <span id="char-count" class="text-muted" style="font-size: 0.75rem;">0</span>
                             <span class="text-muted" style="font-size: 0.75rem;"> / 2200</span>
                         </div>
-                        
-                        {% if form.about.errors %}
-                            <div class="text-danger mt-1" style="font-size: 0.75rem;">{{ form.about.errors|first }}</div>
-                        {% endif %}
                     </div>
                 </div>
             </form>
         </div>
-
-        <div class="text-center mt-4 mb-5">
-            <p class="text-muted small">
-                Створено: {{ post_object.created_at|date:"d.m.Y H:i" }}
-            </p>
-        </div>
     </div>
 </div>
-
-<script>
-    const autoExpandFields = document.querySelectorAll('.auto-expand');
-    const textareaAbout = document.getElementById('id_about');
-    const charCount = document.getElementById('char-count');
-    const MAX_CHARS = 2200;
-
-    // Авто-высота
-    const adjustHeight = (el) => {
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-    };
-
-    autoExpandFields.forEach(field => {
-        field.addEventListener('input', () => adjustHeight(field));
-        adjustHeight(field);
-    });
-
-    // Лимит символов
-    const handleAboutInput = () => {
-        if (textareaAbout.value.length > MAX_CHARS) {
-            textareaAbout.value = textareaAbout.value.substring(0, MAX_CHARS);
-        }
-        const currentLength = textareaAbout.value.length;
-        charCount.textContent = currentLength;
-        charCount.className = currentLength >= 2100 ? 'text-danger' : 'text-muted';
-    };
-
-    textareaAbout.addEventListener('input', handleAboutInput);
-    handleAboutInput();
-
-    // Предпросмотр нового медиа
-    const mediaInput = document.getElementById('id_media');
-    const previewContainer = document.getElementById('media-preview-container');
-    const imgPreview = document.getElementById('image-preview');
-    const videoPreview = document.getElementById('video-preview');
-    const fileNameHint = document.getElementById('file-name-hint');
-
-    mediaInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const isVideo = file.type.startsWith('video/');
-            fileNameHint.textContent = file.name;
-            previewContainer.classList.remove('d-none');
-            
-            if (isVideo) {
-                imgPreview.classList.add('d-none');
-                videoPreview.classList.remove('d-none');
-                videoPreview.src = URL.createObjectURL(file);
-            } else {
-                videoPreview.classList.add('d-none');
-                imgPreview.classList.remove('d-none');
-                imgPreview.src = URL.createObjectURL(file);
-            }
-        }
-    });
-</script>
 
 <style>
     body { background-color: #fafafa !important; }
@@ -151,4 +91,6 @@
     .update-post-card { animation: slideUpFade 0.5s ease-out; }
     @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
-{% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/MainPage/post-update.js' %}"></script>{% endblock extra_js %}
+{% endblock content %}

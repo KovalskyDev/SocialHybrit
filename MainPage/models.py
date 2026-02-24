@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class CustomUser(AbstractUser):
     GENDER_FEMALE = "female"
@@ -18,7 +19,10 @@ class CustomUser(AbstractUser):
         (ROLE_USER, "User")
     ]
 
-    age = models.IntegerField(null=True, blank=True)
+    age = models.PositiveIntegerField(null=True, blank=True, validators=[
+            MinValueValidator(13, message="Тобі має бути хоча б 13 років!"),
+            MaxValueValidator(100, message="Ну ти і довгожитель. Введи реальний вік!")
+        ])
     gender = models.CharField(max_length=30, choices=GENDER_CHOICES, null=True, blank=True)
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default=ROLE_USER)
@@ -42,12 +46,10 @@ class CustomUser(AbstractUser):
         """
         if not user or user.is_anonymous:
             return False
-        
         # Если это сам владелец профиля — всегда можно
         if self == user:
             return True
-            
-        # Если это админ — проверяем, разрешено ли админам здесь хозяйничать
+        # Если это админ — проверяем, разрешено ли админам здесь управлять
         if getattr(user, 'is_admin', False) and allow_admin:
             return True
             
@@ -88,6 +90,15 @@ class Post(models.Model):
     def likes_count(self):
         return self.likes.count()
 
+    @property
+    def replies_count(self):
+        return self.replies.count()
+
+    def save(self, *args, **kwargs):
+        if self.about:
+            self.about = self.about.strip() # Удалит пробелы и переносы в начале и конце
+        super().save(*args, **kwargs)
+
 class Like(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user_likes")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
@@ -100,3 +111,14 @@ class Like(models.Model):
     
     def __str__(self):
         return f"{self.user.username} likes post {self.post.name}"
+    
+class Reply(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user_replies")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="replies")
+    text = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ['created_at'] # Старые сверху, новые добавляются вниз
+
+    def __str__(self):
+        return f"{self.user.username} до {self.post.name[:20]}"
