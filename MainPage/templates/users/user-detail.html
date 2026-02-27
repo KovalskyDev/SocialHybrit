@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <ul class="nav nav-tabs border-0 justify-content-center mb-3 mb-md-4" id="profileTabs">
+        <ul class="nav nav-tabs border-0 justify-content-center mb-1 mb-md-2" id="profileTabs">
             <li class="nav-item">
                 <a class="nav-link active border-0 border-top border-2 border-emphasis rounded-0 bg-transparent text-emphasis fw-bold small" href="#">
                     <i class="bi bi-grid-3x3 me-2"></i>ДОПИСИ
@@ -77,41 +77,43 @@
             </li>
         </ul>
 
-        <div class="row g-1 g-md-3 mt-2 mb-5 mx-0"> 
-            {% for post in cmuser_object.posts.all %}
-                <div class="col-4">
-                    <a href="{% url 'post-list' %}#post-{{ post.pk }}" class="post-grid-item shadow-sm">
-                        <div class="post-grid-content">
-                            {% if post.media %}
-                                {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
-                                    <div class="video-icon-badge"><i class="bi bi-play-fill"></i></div>
-                                    <video src="{{ post.media.url }}" class="grid-media"></video>
+        <div class="profile-posts-grid-wrapper mb-5">
+            <div class="row g-1 justify-content-start"> 
+                {% for post in cmuser_object.posts.all %}
+                    <div class="col-4 col-lg-3">
+                        <a href="{% url 'post-list' %}#post-{{ post.pk }}" class="post-grid-item shadow-sm">
+                            <div class="post-grid-content">
+                                {% if post.media %}
+                                    {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
+                                        <div class="video-icon-badge"><i class="bi bi-play-fill"></i></div>
+                                        <video src="{{ post.media.url }}" class="grid-media"></video>
+                                    {% else %}
+                                        <img src="{{ post.media.url }}" class="grid-media" loading="lazy">
+                                    {% endif %}
                                 {% else %}
-                                    <img src="{{ post.media.url }}" class="grid-media" loading="lazy">
+                                    <div class="grid-media d-flex align-items-center justify-content-center p-2 p-md-3 text-center bg-custom-gradient">
+                                        <div class="post-grid-text-wrapper">
+                                            <span class="post-grid-text fw-bold text-white">{{ post.name }}</span>
+                                        </div>
+                                    </div>
                                 {% endif %}
-                            {% else %}
-                                <div class="grid-media d-flex align-items-center justify-content-center p-2 p-md-3 text-center bg-custom-gradient">
-                                    <div class="post-grid-text-wrapper">
-                                        <span class="post-grid-text fw-bold text-white small">{{ post.name }}</span>
+                                
+                                <div class="post-grid-overlay">
+                                    <div class="d-flex gap-2 gap-md-3">
+                                        <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
+                                        <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
                                     </div>
                                 </div>
-                            {% endif %}
-                            
-                            <div class="post-grid-overlay">
-                                <div class="d-flex gap-2 gap-md-3">
-                                    <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
-                                    <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
-                                </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            {% empty %}
-                <div class="col-12 text-center py-5">
-                    <i class="bi bi-camera text-secondary display-1 opacity-25"></i>
-                    <p class="text-secondary mt-3">Ще немає публікацій</p>
-                </div>
-            {% endfor %}
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-camera text-secondary display-1 opacity-25"></i>
+                        <p class="text-secondary mt-3">Ще немає публікацій</p>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
