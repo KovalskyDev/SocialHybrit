@@ -40,7 +40,7 @@ def password_change(request):
         form = PasswordChangeForm(request.user)
     
     # Используем тот же контекст, что и в редактировании профиля
-    return render(request, 'users/auth/password_change.html', {
+    return render(request, 'users/auth/password-change.html', {
         'form': form,
         'cmuser_object': request.user
     })
@@ -117,11 +117,6 @@ class ListPostView(ListView):
             ).values_list('post_id', flat=True)
         return context
 
-class DetailPostView(DetailView): # убрать(заменил логику на то шо теперь это не нужно, а перекидывает на пост-лист с якорем)
-    model = models.Post
-    template_name = "posts/post-detail.html"
-    context_object_name = "post_object"
-
 class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.Post
     template_name = "posts/post-update.html"
@@ -136,6 +131,9 @@ class DeletePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView):
     template_name = "posts/post-delete-confirmation.html"
     success_url = reverse_lazy("post-list")
     context_object_name = "post_object"
+
+    def get_success_url(self):
+        return reverse_lazy('post-list')
 
 class PostLikeToggle(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -153,7 +151,7 @@ class PostLikeToggle(LoginRequiredMixin, View):
             if not created:
                 like.delete()
 
-        return _redirect_to_post(request, post.id)
+        return _redirect_to_post(request, post_id)
 
 
 @login_required

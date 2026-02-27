@@ -1,0 +1,54 @@
+/* --- ПЕРЕМЕННЫЕ И ФОН --- */
+.update-post-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    display: block;
+}
+
+/* --- ПОЛЯ ВВОДА --- */
+.auto-expand {
+    color: var(--bs-emphasis-color) !important;
+}
+
+.auto-expand::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 0.6;
+}
+
+.char-counter {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    background: var(--bs-secondary-bg);
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+
+/* --- АНИМАЦИИ --- */
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Эффект для кнопок */
+.btn-link:active {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+/* --- АДАПТИВНОСТЬ --- */
+@media (max-width: 576px) {
+    .card-header h6 {
+        font-size: 0.95rem;
+    }
+    #media-preview-container {
+        min-height: 250px;
+    }
+}
