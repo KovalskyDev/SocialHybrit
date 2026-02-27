@@ -32,3 +32,4 @@ if settings.DEBUG:
 
 handler403 = 'MainPage.views.error_403'
 handler404 = 'MainPage.views.error_404'
+handler405 = 'MainPage.views.error_405'

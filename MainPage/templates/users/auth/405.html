@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Метод не дозволено (405){% endblock %}
+
+{% block content %}
+<div class="error-container row justify-content-center align-items-center mx-0">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <div class="error-icon-wrapper mb-4">
+            <i class="bi bi-slash-circle error-icon-405"></i>
+        </div>
+        
+        <h2 class="fw-bold mb-3 error-title">Упс! Сюди так не можна</h2>
+        <p class="text-secondary mb-4 px-3 px-md-5 error-text">
+            Схоже, ви намагаєтесь отримати доступ до дії у неправильний спосіб. 
+            Ця сторінка очікує дані з форми, а не простого перегляду.
+        </p>
+        
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
+            <a href="{% url 'post-list' %}" class="btn btn-error-primary fw-bold px-4 rounded-pill">
+                На головну
+            </a>
+            <button onclick="history.back()" class="btn btn-error-link fw-bold">
+                Повернутися назад
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Наследуем твои базовые стили и добавляем щепотку магии для 405 */
+    .error-container {
+        min-height: 75vh;
+        animation: fadeInError 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .error-icon-405 {
+        font-size: clamp(4rem, 12vw, 7rem);
+        background: var(--hybrid-grad); /* Твой фирменный градиент */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        opacity: 0.8;
+        display: inline-block;
+        animation: pulseLock 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseLock {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
+
+    .error-title {
+        color: var(--bs-emphasis-color);
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+        letter-spacing: -0.5px;
+    }
+
+    /* Твои кнопки */
+    .btn-error-primary {
+        background-color: var(--bs-emphasis-color) !important;
+        color: var(--bs-body-bg) !important;
+        border: none !important;
+        padding: 12px 32px;
+        transition: all 0.3s ease !important;
+    }
+
+    .btn-error-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        opacity: 0.9 !important;
+    }
+
+    .btn-error-link {
+        color: var(--bs-emphasis-color) !important;
+        text-decoration: none !important;
+        padding: 10px 20px;
+        opacity: 0.6;
+    }
+
+    .btn-error-link:hover { opacity: 1; }
+
+    @keyframes fadeInError {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+{% endblock %}

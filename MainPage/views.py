@@ -25,6 +25,9 @@ def error_403(request, exception):
 def error_404(request, exception):
     return render(request, 'users/auth/404.html', status=404)
 
+def error_405(request, exception):
+    return render(request, 'users/auth/405.html', status=405)
+
 
 @login_required
 def password_change(request):
