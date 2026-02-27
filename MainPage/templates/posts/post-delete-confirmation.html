@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %} 
+<link rel="stylesheet" href="{% static 'css/MainPage/post-delete-confirmation.css' %}">
+{% endblock extra_css %}
+
+{% block title %}Видалити допис{% endblock %}
+
+{% block content %}
+<div class="delete-page-fullscreen d-flex align-items-center justify-content-center">
+    <div class="row justify-content-center w-100 mx-0 container-z">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4 col-xxl-3 d-flex justify-content-center px-2">
+            
+            <div class="card delete-card border-1 shadow-lg overflow-hidden">
+                <div class="card-body p-4 pt-5 text-center">
+                    <div class="mb-3">
+                        <div class="delete-icon-box d-inline-flex align-items-center justify-content-center rounded-circle mx-auto">
+                            <i class="bi bi-exclamation-octagon fs-1"></i>
+                        </div>
+                    </div>
+                    
+                    <h5 class="fw-bold mb-2 delete-title">Видалити допис?</h5>
+                    <div class="px-3 mb-4">
+                        <p class="text-muted small">
+                            Ви впевнені, що хочете видалити <br>
+                            <strong class="text-emphasis-custom">"{{ post_object.name }}"</strong>? 
+                        </p>
+                        <p class="text-danger small fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05rem; text-transform: uppercase;">
+                            Цю дію неможливо буде скасувати.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column border-top">
+                    <form method="POST" class="m-0 border-bottom">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link w-100 py-3 text-danger fw-bold text-decoration-none rounded-0 action-btn">
+                            Видалити
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'post-list'%}#post-{{ post_object.pk }}" class="btn btn-link w-100 py-3 text-secondary text-decoration-none small rounded-0 action-btn">
+                        Скасувати
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="position-absolute bottom-0 mb-4 w-100 text-center px-3">
+        <p class="text-muted mb-0" style="font-size: 0.75rem; opacity: 0.7;">
+            SocialHybrit піклується про ваш контент. Подумайте двічі!
+        </p>
+    </div>
+</div>
+{% endblock content %}

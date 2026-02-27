@@ -1,0 +1,94 @@
+/* --- ОСНОВНОЙ КОНТЕЙНЕР (ПОЛНЫЙ ЭКРАН) --- */
+.delete-page-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    background-color: var(--bs-body-bg);
+    z-index: 100;
+}
+
+/* --- КАРТОЧКА С АНИМАЦИЕЙ ДРОЖАНИЯ --- */
+.delete-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    border-radius: 16px !important;
+    /* Тот самый эффект дрожания при появлении */
+    animation: shakeIn 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    width: 100%;
+    max-width: 400px;
+    z-index: 101;
+}
+
+.delete-title {
+    color: var(--bs-emphasis-color);
+}
+
+.text-emphasis-custom {
+    color: var(--bs-emphasis-color);
+}
+
+/* --- ИКОНКА ПРЕДУПРЕЖДЕНИЯ --- */
+.delete-icon-box {
+    width: 80px;
+    height: 80px;
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+/* --- КНОПКИ ДЕЙСТВИЯ --- */
+.action-btn {
+    transition: background-color 0.2s ease;
+    border: none;
+    background: transparent;
+}
+
+.action-btn:hover {
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
+/* --- КЛЮЧЕВЫЕ КАДРЫ АНИМАЦИИ (SHAKE) --- */
+@keyframes shakeIn {
+    0% { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    /* Дрожание влево-вправо для эффекта тревоги */
+    20%, 40%, 60%, 80% { 
+        transform: translateX(-4px); 
+    }
+    30%, 50%, 70% { 
+        transform: translateX(4px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* --- АДАПТИВНОСТЬ ПОД ЭКРАНЫ --- */
+@media (min-width: 768px) {
+    .delete-card { max-width: 440px; }
+}
+
+@media (min-width: 1024px) {
+    .delete-card { max-width: 480px; }
+}
+
+@media (min-width: 1440px) {
+    .delete-card { max-width: 520px; }
+}
+
+@media (max-width: 375px) {
+    .delete-card { 
+        margin: 15px; 
+        border-radius: 12px !important; 
+    }
+}
+
+/* Фикс для плавности кнопок в темной теме */
+[data-bs-theme="dark"] .action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}

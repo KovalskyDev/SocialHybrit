@@ -1,0 +1,88 @@
+/* --- ЦЕНТРИРОВАНИЕ И ФОН --- */
+.bg-page-overlay {
+    background-color: var(--bs-body-bg); /* Берет цвет темы */
+    z-index: 1000;
+}
+
+.delete-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    animation: shakeIn 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    transition: all 0.3s ease-in-out;
+    width: 100%; /* Чтобы колонки Bootstrap работали правильно */
+}
+
+.delete-title {
+    color: var(--bs-emphasis-color);
+    font-size: 1.5rem;
+}
+
+.text-emphasis-custom {
+    color: var(--bs-emphasis-color);
+}
+
+.delete-footer {
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
+/* --- ИКОНКА --- */
+.warning-icon-wrapper {
+    width: 85px; 
+    height: 85px;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* --- КНОПКИ --- */
+.btn-danger-confirm {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-danger-confirm:hover {
+    filter: brightness(0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-cancel-confirm {
+    background-color: var(--bs-secondary-bg) !important;
+    color: var(--bs-secondary-color) !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel-confirm:hover {
+    background-color: var(--bs-tertiary-bg) !important;
+    color: var(--bs-emphasis-color) !important;
+}
+
+/* --- АДАПТИВНАЯ ШИРИНА --- */
+@media (min-width: 768px) {
+    .delete-card { max-width: 460px; }
+}
+
+@media (min-width: 1024px) {
+    .delete-card { max-width: 520px; }
+}
+
+@media (min-width: 1440px) {
+    .delete-card { max-width: 580px; }
+}
+
+/* --- АНИМАЦИЯ --- */
+@keyframes shakeIn {
+    0% { opacity: 0; transform: translateY(30px); }
+    20%, 40%, 60%, 80% { transform: translateX(-3px); }
+    30%, 50%, 70% { transform: translateX(3px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 425px) {
+    .delete-card {
+        border-radius: 12px;
+        margin: 15px;
+    }
+}

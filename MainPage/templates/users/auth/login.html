@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %} 
+<link rel="stylesheet" href="{% static 'css/MainPage/login.css' %}">
+{% endblock extra_css %}
+
+{% block title %}Вхід{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center mx-0" style="min-height: 80vh;">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4 col-xl-3">
+        
+        <div class="card login-card border-1 p-4 shadow-sm">
+            <div class="text-center mb-4 mt-3">
+                <h1 class="login-logo fs-2 fw-bold">Social<span class="logo-accent">Hybrit</span></h1>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small border-0">
+                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <input type="{{ field.field.widget.input_type }}" 
+                               name="{{ field.name }}" 
+                               id="{{ field.id_for_label }}"
+                               class="form-control login-input py-2 px-3" 
+                               placeholder="{{ field.label }}"
+                               {% if field.value %}value="{{ field.value }}"{% endif %}
+                               required>
+                        
+                        {% if field.errors %}
+                            <div class="text-danger mt-1" style="font-size: 0.75rem;">
+                                {{ field.errors|first }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-login-submit fw-bold py-2">
+                        Увійти
+                    </button>
+                </div>
+            </form>
+
+            <div class="position-relative my-4">
+                <hr class="opacity-25">
+                <span class="or-divider-text position-absolute top-50 start-50 translate-middle px-3 text-muted fw-bold small">АБО</span>
+            </div>
+
+            <div class="text-center mb-3">
+                <a href="#" class="facebook-login-link text-decoration-none small fw-bold">
+                    <i class="bi bi-facebook me-1"></i> Увійти через Facebook
+                </a>
+            </div>
+        </div>
+
+        <div class="card border-1 mt-3 p-3 text-center shadow-sm">
+            <p class="small m-0">
+                Ще не маєте акаунту? 
+                <a href="{% url 'register' %}" class="register-link fw-bold text-decoration-none">Зареєструватися</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

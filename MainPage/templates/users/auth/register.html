@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %} 
+<link rel="stylesheet" href="{% static 'css/MainPage/register.css' %}">
+{% endblock extra_css %}
+
+{% block title %}Реєстрація{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center my-3 my-md-5 mx-0">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+        
+        <div class="card register-card border-1 p-4 shadow-sm">
+            <div class="text-center mb-3 mt-3">
+                <h1 class="login-logo fs-2 fw-bold">Social<span class="logo-accent">Hybrit</span></h1>
+                <p class="text-muted fw-bold small px-3">Зареєструйтеся, щоб переглядати фото та відео своїх друзів.</p>
+                
+                <button class="btn btn-fb-custom btn-sm w-100 fw-bold py-2 mb-3">
+                    <i class="bi bi-facebook me-2"></i> Увійти через Facebook
+                </button>
+                
+                <div class="position-relative my-4">
+                    <hr class="opacity-25">
+                    <span class="or-divider-text position-absolute top-50 start-50 translate-middle px-3 text-muted fw-bold small">АБО</span>
+                </div>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-2">
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                               name="{{ field.name }}" 
+                               id="{{ field.id_for_label }}"
+                               class="form-control login-input py-2" 
+                               placeholder="{{ field.label }}"
+                               {% if field.value %}value="{{ field.value }}"{% endif %}>
+                        
+                        {% if field.errors %}
+                            <div class="text-danger mb-1" style="font-size: 0.7rem;">
+                                {{ field.errors|first }}
+                            </div>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <div class="text-muted mb-2 px-1 help-text-custom">
+                                {{ field.help_text|safe|truncatechars:100 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-register-submit fw-bold py-2">
+                        Зареєструватися
+                    </button>
+                </div>
+
+                <p class="text-center text-muted mt-3 px-2 legal-text">
+                    Реєструючись, ви погоджуєтеся з нашими <strong>Умовами</strong>, <strong>Політикою конфіденційності</strong>.
+                </p>
+            </form>
+        </div>
+
+        <div class="card border-1 mt-3 p-3 text-center shadow-sm">
+            <p class="small m-0">
+                Є акаунт? 
+                <a href="{% url 'login' %}" class="login-link fw-bold text-decoration-none">Увійти</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

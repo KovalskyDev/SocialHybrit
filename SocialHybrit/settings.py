@@ -15,7 +15,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "MainPage",
+    "rest_framework",
+    "API"
 ]
 
 MIDDLEWARE = [
@@ -102,3 +105,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR, 'static'
+]
+
+AUTH_USER_MODEL = 'MainPage.CustomUser'
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "post-list"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

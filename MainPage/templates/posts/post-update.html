@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/post-update.css' %}">{% endblock extra_css %}
+
+
+{% block title %}Редагувати Допис{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3 mt-md-5 mx-0">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-6 px-1">
+        
+        <div class="card settings-card border-1 rounded-3 shadow-sm update-post-card overflow-hidden">
+            
+            <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
+                <a href="{% url 'post-list' %}#post-{{ post_object.pk }}" class="text-decoration-none text-secondary small fw-bold">
+                    <i class="bi bi-x-lg me-1"></i> Скасувати
+                </a>
+                <h6 class="m-0 fw-bold">Редагувати допис</h6>
+                <button type="submit" form="update-post-form" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">
+                    Зберегти
+                </button>
+            </div>
+
+            <form method="POST" id="update-post-form" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                
+                <div class="card-body p-0">
+                    <div id="media-preview-container" class="bg-black d-flex align-items-center justify-content-center {% if not post_object.media %}d-none{% endif %}" style="min-height: 350px;">
+                        <div class="position-relative w-100 text-center">
+                            {% if post_object.media %}
+                                {% if post_object.media.url|lower|slice:"-4:" == ".mp4" or post_object.media.url|lower|slice:"-4:" == ".mov" %}
+                                    <video id="video-preview" src="{{ post_object.media.url }}" controls class="w-100" style="max-height: 600px;"></video>
+                                    <img id="image-preview" class="w-100 d-none" style="max-height: 600px; object-fit: contain;">
+                                {% else %}
+                                    <img id="image-preview" src="{{ post_object.media.url }}" class="w-100" style="max-height: 600px; object-fit: contain;">
+                                    <video id="video-preview" class="w-100 d-none" controls style="max-height: 600px;"></video>
+                                {% endif %}
+                            {% else %}
+                                <img id="image-preview" class="w-100 d-none" style="max-height: 600px; object-fit: contain;">
+                                <video id="video-preview" class="w-100 d-none" controls style="max-height: 600px;"></video>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="p-3 border-bottom d-flex align-items-center flex-wrap gap-2">
+                        <label for="id_media" class="btn btn-secondary btn-sm fw-bold rounded-pill px-3">
+                            <i class="bi {% if post_object.media %}bi-arrow-repeat{% else %}bi-plus-lg{% endif %} me-2"></i>
+                            <span id="label-text">{% if post_object.media %}Змінити{% else %}Додати{% endif %}</span>
+                        </label>
+                        <input type="file" name="media" id="id_media" accept="image/*,video/*" class="d-none">
+                        
+                        <button type="button" id="delete-media-btn" class="btn btn-outline-danger btn-sm rounded-pill px-3 {% if not post_object.media %}d-none{% endif %}">
+                            <i class="bi bi-trash me-1"></i> Видалити
+                        </button>
+
+                        <input type="checkbox" name="media-clear" id="media-clear_id" class="d-none">
+
+                        <span id="file-name-hint" class="small text-muted ms-md-auto w-100 w-md-auto mt-2 mt-md-0 text-md-end">
+                            {% if post_object.media %}Файл завантажено{% else %}Файл не обрано{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="p-3 border-bottom settings-sidebar">
+                        <label class="post-label mb-1">Заголовок</label>
+                        <textarea name="name" maxlength="100" required id="id_name" 
+                                  class="form-control border-0 shadow-none bg-transparent p-0 fw-bold auto-expand" 
+                                  placeholder="Назва допису..." 
+                                  style="font-size: 1.25rem; resize: none; overflow: hidden; min-height: 35px;"
+                                  rows="1">{{ form.name.value|default:post_object.name }}</textarea>
+                    </div>
+
+                    <div class="p-3">
+                        <label class="post-label mb-1">Опис</label>
+                        <textarea name="about" maxlength="2200" required id="id_about" 
+                                  class="form-control border-0 shadow-none p-0 bg-transparent auto-expand" 
+                                  placeholder="Про що цей допис?" 
+                                  style="resize: none; overflow: hidden; font-size: 1rem; min-height: 150px;"
+                                  rows="1">{{ form.about.value|default:post_object.about }}</textarea>
+                        
+                        <div class="d-flex justify-content-end align-items-center mt-2 border-top pt-2">
+                            <div class="char-counter">
+                                <span id="char-count" class="fw-bold">0</span>/2200
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}<script src="{% static 'js/MainPage/post-update.js' %}"></script>{% endblock extra_js %}
+{% endblock content %}

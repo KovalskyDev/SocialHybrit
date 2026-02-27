@@ -1,0 +1,67 @@
+/* --- ПЕРЕМЕННЫЕ --- */
+:root {
+    --hybrid-grad: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
+}
+
+/* --- ОБЩИЙ ВИД --- */
+.register-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ТОТ САМЫЙ ГРАДИЕНТ */
+.login-logo { color: var(--bs-emphasis-color); letter-spacing: -1px; }
+.logo-accent {
+    background: var(--hybrid-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ПОЛЯ ВВОДА */
+.login-input {
+    background-color: var(--bs-tertiary-bg) !important;
+    border: 1px solid var(--bs-border-color-translucent) !important;
+    color: var(--bs-emphasis-color) !important;
+    font-size: 0.85rem;
+}
+.login-input:focus {
+    border-color: var(--bs-secondary-color) !important;
+    box-shadow: none !important;
+}
+
+/* КНОПКИ */
+.btn-register-submit {
+    background-color: var(--bs-emphasis-color) !important;
+    color: var(--bs-body-bg) !important;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+.btn-register-submit:hover { opacity: 0.85; }
+.btn-register-submit:active { transform: scale(0.97); }
+
+.btn-fb-custom {
+    background-color: #0095f6 !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* РАЗДЕЛИТЕЛЬ */
+.or-divider-text { background-color: var(--bs-body-bg); }
+
+/* ТЕКСТЫ */
+.help-text-custom { font-size: 0.65rem; line-height: 1.2; opacity: 0.7; }
+.legal-text { font-size: 0.7rem; }
+.login-link { color: #0095f6; }
+
+/* АНИМАЦИЯ */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* MOBILE S */
+@media (max-width: 320px) {
+    .register-card { padding: 1rem !important; }
+    .login-logo { font-size: 1.5rem !important; }
+}

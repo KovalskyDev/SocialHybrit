@@ -1,0 +1,78 @@
+<footer class="footer py-5 mt-auto border-top">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+            <a href="#" class="small-footer-link">Про нас</a>
+            <a href="#" class="small-footer-link">Допомога</a>
+            <a href="#" class="small-footer-link">Преса</a>
+            <a href="{% url 'post-list-api' %}" class="small-footer-link" target="_blank">API</a>
+            <a href="#" class="small-footer-link">Вакансії</a>
+            <a href="#" class="small-footer-link">Конфіденційність</a>
+            <a href="#" class="small-footer-link">Умови</a>
+            <a href="#" class="small-footer-link">Локації</a>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3">
+            <div class="language-selector">
+                <span class="text-secondary fw-bold">
+                    UKRAINIAN <i class="bi bi-chevron-down ms-1" style="font-size: 0.6rem;"></i>
+                </span>
+            </div>
+            <div class="copyright-text text-secondary opacity-75">
+                © 2026 SOCIALHYBRIT FROM ME
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Базовые настройки для прижатия к низу */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.footer {
+    /* Автоматический фон под тему */
+    background-color: var(--bs-body-bg);
+    border-top-color: var(--bs-border-color-translucent) !important;
+}
+
+.small-footer-link {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.small-footer-link:hover {
+    /* Цвет акцента при наведении под тему */
+    color: var(--bs-emphasis-color) !important;
+    text-decoration: underline !important;
+}
+
+.language-selector span {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
+
+.copyright-text {
+    font-size: 0.75rem;
+}
+
+/* Адаптивность для Mobile S (320px) */
+@media (max-width: 320px) {
+    .footer {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    .small-footer-link {
+        font-size: 0.65rem;
+    }
+    .gap-3 {
+        gap: 0.5rem !important;
+    }
+}
+</style>

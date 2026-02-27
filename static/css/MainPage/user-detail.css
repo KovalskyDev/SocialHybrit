@@ -1,0 +1,232 @@
+/* --- ПЕРЕМЕННЫЕ И ОСНОВА --- */
+:root {
+    --hybrid-grad: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
+}
+
+/* --- АВАТАР ПРОФИЛЯ --- */
+.profile-avatar-v3 {
+    background: var(--hybrid-grad);
+    border-radius: 50%;
+    width: clamp(80px, 20vw, 150px);
+    height: clamp(80px, 20vw, 150px);
+    aspect-ratio: 1 / 1; 
+    flex-shrink: 0; 
+    padding: 3px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-inner {
+    border: 2px solid var(--bs-body-bg) !important;
+}
+
+.avatar-letter {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+}
+
+/* --- ТЕКСТ И ИМЯ --- */
+.user-title {
+    letter-spacing: -1px;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    color: var(--bs-emphasis-color);
+}
+
+/* --- КНОПКИ (РЕДАКТИРОВАНИЕ И СООБЩЕНИЯ) --- */
+.btn-edit-profile {
+    background-color: var(--bs-emphasis-color) !important;
+    color: var(--bs-body-bg) !important;
+    border: none;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-custom {
+    background-color: var(--bs-secondary-bg) !important;
+    color: var(--bs-emphasis-color) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    transition: opacity 0.2s ease;
+}
+
+.btn-edit-profile:hover, .btn-secondary-custom:hover {
+    opacity: 0.8;
+}
+
+[data-bs-theme="dark"] .btn-edit-profile {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* --- РАСШИРЯЕМАЯ СЕТКА ПОСТОВ (МАГИЯ ДЕСКТОПА) --- */
+@media (min-width: 992px) {
+    .profile-posts-grid-wrapper {
+        width: 115%; /* Сетка шире контента */
+        margin-left: -7.5%;
+    }
+}
+
+@media (min-width: 1400px) {
+    .profile-posts-grid-wrapper {
+        width: 125%; 
+        margin-left: -12.5%;
+    }
+}
+
+/* --- КАРТОЧКА ПОСТА (ВЕРТИКАЛЬНАЯ) --- */
+.post-grid-item {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    border-radius: 0; /* Строгий плотный стиль */
+    overflow: hidden;
+    aspect-ratio: 3 / 4; /* Вертикальный прямоугольник */
+    background: var(--bs-secondary-bg);
+    border: none;
+}
+
+.post-grid-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.grid-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.3s ease; /* Только яркость, без зума */
+}
+
+/* --- КРУПНЫЙ ТЕКСТ НА ГРАДИЕНТЕ --- */
+.bg-custom-gradient {
+    background: var(--hybrid-grad);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-grid-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    /* Увеличенный адаптивный шрифт */
+    font-size: clamp(0.90rem, 1.5vw, 2rem); 
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+    color: white;
+    
+    /* Убийца спама */
+    word-break: break-word; 
+    overflow-wrap: anywhere; 
+    
+    padding: 0 15px;
+}
+
+/* --- ОВЕРЛЕЙ (ЛАЙКИ / КОММЕНТЫ) --- */
+.post-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.post-grid-overlay span {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+}
+
+/* --- ХОВЕР ЭФФЕКТЫ (БЕЗ ДЕРГАНИЙ) --- */
+@media (hover: hover) {
+    .post-grid-item:hover .post-grid-overlay {
+        opacity: 1;
+    }
+    .post-grid-item:hover .grid-media {
+        filter: brightness(0.7); /* Просто приглушаем картинку */
+    }
+}
+
+/* --- ВИДЕО ИКОНКА --- */
+.video-icon-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    color: white;
+    z-index: 2;
+}
+
+/* --- ТАБЫ И СТАТИСТИКА --- */
+.nav-tabs .nav-link.active {
+    border-top: 2px solid var(--bs-emphasis-color) !important;
+    color: var(--bs-emphasis-color) !important;
+    background: transparent !important;
+}
+
+@media (max-width: 425px) {
+    .stats-row { justify-content: space-between; gap: 5px !important; }
+    .stat-item { font-size: 0.75rem; text-align: center; }
+    .stat-item strong { display: block; font-size: 0.95rem; }
+}
+
+/* --- МОБИЛЬНАЯ АДАПТАЦИЯ ШАПКИ --- */
+@media (max-width: 575px) {
+    .action-buttons-wrapper {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .action-buttons-wrapper .btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+
+/* --- ФИКС ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (Mobile S, M, L) --- */
+@media (max-width: 425px) {
+    .post-grid-text {
+        /* 1. Снижаем размер еще немного для мобилок */
+        font-size: clamp(0.75rem, 3.5vw, 0.9rem); 
+        
+        /* 2. Убираем жирнючий капс, чтобы буквы стали уже */
+        text-transform: none; 
+        font-weight: 700; /* Чуть меньше жирности, чтобы не сливалось */
+        
+        /* 3. Сжимаем межбуквенный интервал (буквы прижмутся друг к другу) */
+        letter-spacing: -0.5px;
+        
+        /* 4. Даем тексту чуть больше места по краям */
+        padding: 0 8px;
+        
+        /* 5. Увеличиваем количество строк, раз шрифт стал меньше */
+        -webkit-line-clamp: 5; 
+    }
+}
+
+/* Совсем экстремальный фикс для Mobile S (320px) */
+@media (max-width: 320px) {
+    .post-grid-text {
+        font-size: 0.7rem;
+        line-height: 1;
+        padding: 0 4px;
+    }
+}

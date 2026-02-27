@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/post-list.css' %}">{% endblock extra_css %}
+
+{% block title %}Стрічка{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mx-0">
+    <div class="col-12 col-md-8 col-lg-6 post-feed-container">
+        
+        <div class="d-flex justify-content-between align-items-center my-4 px-2 px-md-0">
+            <h4 class="fw-bold m-0 page-main-title">Для вас</h4>
+            <a href="{% url 'post-create' %}" class="btn btn-dark btn-sm rounded-pill fw-bold px-3">Створити пост</a>
+        </div>
+
+        {% for post in posts_objects %}
+            <article id="post-{{ post.pk }}" class="card mb-4 post-item border-1 shadow-sm">
+                
+                <div class="card-header border-0 py-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar-v3">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-avatar-placeholder" style="width: 32px; height: 32px;">
+                                {% if post.creator.avatar %}
+                                    <img src="{{ post.creator.avatar.url }}" class="w-100 h-100" style="object-fit: cover;" draggable="false">
+                                {% else %}
+                                    <span class="small fw-bold">{{ post.creator.username|slice:":1"|upper }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <a href="{% url 'user-detail' post.creator.pk %}" class="text-decoration-none fw-bold mb-0 d-block post-author-name">
+                                {{ post.creator.username }}
+                            </a>
+                            <span class="text-muted post-date">{{ post.created_at|date:"d M" }}</span>
+                        </div>
+                    </div>
+
+                    {% if post.creator == user or user.is_admin %}
+                    <div class="dropdown">
+                        <i class="bi bi-three-dots cursor-pointer" data-bs-toggle="dropdown"></i>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-1">
+                            <li><a class="dropdown-item small fw-bold" href="{% url 'post-update' post.pk %}"><i class="bi bi-pencil me-2"></i>Редагувати</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item small fw-bold text-danger" href="{% url 'post-delete' post.pk %}"><i class="bi bi-trash me-2"></i>Видалити</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <i class="bi bi-three-dots cursor-pointer"></i>
+                    {% endif %}
+                </div>
+
+                <div class="position-relative media-wrapper">
+                    <div class="media-container d-flex align-items-center justify-content-center overflow-hidden">
+                        {% if post.media %}
+                            {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
+                                <video src="{{ post.media.url }}" controls class="w-100 h-100" style="object-fit: cover;"></video>
+                            {% else %}
+                                <img src="{{ post.media.url }}" class="w-100 h-100" style="object-fit: cover;" draggable="false">
+                            {% endif %}
+                            
+                            <div class="post-title-overlay">
+                                <h5 class="m-0 text-white fw-bold small px-3 py-2">{{ post.name }}</h5>
+                            </div>
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center post-no-media-bg">
+                                <h3 class="fw-bold post-title-display text-center px-4">{{ post.name }}</h3>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="like-heart-pop">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                </div>
+
+                <div class="card-body px-0 pb-0"> 
+                    <div class="d-flex justify-content-between mb-2 px-3">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="d-flex align-items-center gap-1">
+                                <form action="{% url 'post-like' post.pk %}" method="post" class="m-0 like-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" class="like-action-input" value="toggle">
+                                    <button type="submit" class="btn p-0 border-0 shadow-none d-flex align-items-center bg-transparent color-inherit">
+                                        {% if post.pk in user_liked_posts_ids %}
+                                            <i class="bi bi-heart-fill fs-4 text-danger"></i>
+                                        {% else %}
+                                            <i class="bi bi-heart fs-4 hover-red"></i>
+                                        {% endif %}
+                                    </button>
+                                </form> 
+                                <span class="fw-bold small">{{ post.likes_count }}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-1">
+                                <button class="btn p-0 border-0 shadow-none d-flex align-items-center bg-transparent color-inherit" onclick="toggleComments('{{ post.pk }}')">
+                                    <i class="bi bi-chat fs-4 hover-blue"></i>
+                                </button>
+                                <span class="fw-bold small">{{ post.replies.count }}</span>
+                            </div>
+
+                            <i class="bi bi-send fs-4 cursor-pointer"></i>
+                        </div>
+                        <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
+                    </div>
+                    
+                    <div class="post-text-container px-3 pb-3">
+                        <span class="fw-bold me-1 post-username">{{ post.creator.username }}</span>
+                        <span class="post-caption">{% if post.about %}<span class="about-short">{{ post.about|truncatechars:100 }}{% if post.about|length > 100 %}<button class="read-more-btn">ще</button>{% endif %}</span>{% if post.about|length > 100 %}<span class="about-full d-none">{{ post.about }}<button class="read-less-btn">приховати</button></span>{% endif %}{% endif %}</span>
+                    </div>
+                </div>
+
+                <div id="comments-section-{{ post.pk }}" class="post-comments-section border-top" style="display: none;">
+                    <div class="replies-list px-3 pt-3">
+                        {% for reply in post.replies.all %}
+                            <div class="reply-item d-flex justify-content-between align-items-start mb-2">
+                                <div style="min-width: 0;">
+                                    <a href="{% url 'user-detail' reply.user.pk %}" class="text-decoration-none color-inherit"><span class="fw-bold me-2 small">{{ reply.user.username }}</span></a>
+                                    <span class="small reply-text">{{ reply.text }}</span>
+                                </div>
+                                {% if reply.user == user or post.creator == user or user.is_admin %}
+                                    <a href="{% url 'delete_reply' reply.pk %}" class="text-muted ms-2 no-select" onclick="return confirm('Видалити цей коментар?')">
+                                        <i class="bi bi-x small"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p class="small text-muted text-center py-2">Ще немає коментарів...</p>
+                        {% endfor %}
+                    </div>
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'add_reply' post.pk %}" method="post" class="p-2 border-top">
+                        {% csrf_token %}
+                        <div class="input-group align-items-end"> 
+                            <textarea name="text" maxlength="500" 
+                                      class="form-control border-0 shadow-none bg-transparent comment-textarea" 
+                                      placeholder="Додати коментар..." 
+                                      rows="1" 
+                                      required></textarea>
+                            <button class="btn btn-link text-primary fw-bold text-decoration-none pb-1" type="submit">ОК</button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</div>
+
+{% block extra_js %}<script src="{% static 'js/MainPage/post-list.js' %}"></script>{% endblock extra_js %}
+{% endblock content %}

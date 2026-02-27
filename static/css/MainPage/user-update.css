@@ -1,0 +1,156 @@
+/* --- ПЕРЕМЕННЫЕ --- */
+:root {
+    --hybrid-grad: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
+}
+
+.settings-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.settings-sidebar {
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
+/* --- АВАТАР --- */
+.avatar-wrapper-update {
+    width: 48px;
+    height: 48px;
+    background: var(--hybrid-grad);
+    padding: 2px;
+    border-radius: 50%;
+}
+.avatar-inner {
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--bs-body-bg) !important;
+}
+
+/* --- НАВИГАЦИЯ --- */
+.settings-nav-link {
+    color: var(--bs-secondary-color) !important;
+    font-size: 0.85rem;
+    padding: 10px 15px;
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+}
+.settings-nav-link.active {
+    color: var(--bs-emphasis-color) !important;
+    font-weight: bold;
+    border-left-color: var(--bs-emphasis-color);
+    background: var(--bs-secondary-bg);
+}
+
+/* --- ПОЛЯ ВВОДА --- */
+.settings-input {
+    background-color: var(--bs-body-bg) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    color: var(--bs-emphasis-color) !important;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+}
+.settings-input:focus {
+    border-color: var(--bs-secondary-color) !important;
+    box-shadow: none !important;
+}
+
+.settings-label { color: var(--bs-emphasis-color); }
+
+/* --- КНОПКИ --- */
+.btn-update-submit {
+    background-color: var(--bs-emphasis-color) !important;
+    color: var(--bs-body-bg) !important;
+    border: none !important;
+    font-size: 0.85rem;
+    padding: 8px 24px;
+    transition: all 0.2s;
+}
+.btn-update-submit:hover { opacity: 0.85; }
+.btn-update-submit:active { transform: scale(0.96); }
+
+.change-photo-btn { color: #0095f6; cursor: pointer; }
+.cancel-link { color: var(--bs-secondary-color); text-decoration: none; }
+.cancel-link:hover { color: var(--bs-emphasis-color); }
+
+/* --- АДАПТИВНОСТЬ --- */
+@media (max-width: 767px) {
+    .settings-label {
+        text-align: left !important;
+        padding-bottom: 5px;
+    }
+}
+
+@media (max-width: 320px) {
+    .p-md-5 { padding: 1.5rem !important; }
+    .user-name-title { font-size: 1rem !important; }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+
+/* --- ГИБКАЯ НАВИГАЦИЯ --- */
+.settings-nav-flex {
+    display: flex;
+    overflow-x: auto; /* Если пунктов станет больше, можно будет скроллить пальцем */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Стили ссылок для мобилок */
+@media (max-width: 767px) {
+    .settings-sidebar {
+        border-end: none !important;
+        border-bottom: 1px solid var(--bs-border-color-translucent);
+    }
+
+    .settings-nav-flex {
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 5px 0;
+    }
+
+    .settings-nav-link {
+        border-left: none !important;
+        border-bottom: 2px solid transparent;
+        padding: 10px 15px !important;
+        flex: 1;
+        text-align: center;
+        font-size: 0.8rem !important;
+    }
+
+    .settings-nav-link.active {
+        border-bottom-color: var(--bs-emphasis-color) !important;
+        background: transparent !important;
+    }
+
+    /* Прячем текст на совсем мелких, оставляем иконки, если нужно, 
+       но тут слов мало, так что влезет. На всякий случай: */
+    .nav-text {
+        display: inline-block;
+    }
+}
+
+/* Стили для десктопа (возвращаем как было) */
+@media (min-width: 768px) {
+    .settings-nav-flex {
+        flex-direction: column;
+    }
+    .settings-nav-link {
+        border-left: 2px solid transparent;
+    }
+}
+
+/* Mobile S (320px) конкретно */
+@media (max-width: 320px) {
+    .settings-nav-link {
+        padding: 8px 5px !important;
+        font-size: 0.75rem !important;
+    }
+    .settings-nav-link i {
+        display: block; /* Иконка над текстом для экономии места */
+        margin-bottom: 2px;
+    }
+}

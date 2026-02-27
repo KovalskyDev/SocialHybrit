@@ -1,0 +1,128 @@
+/* --- КАРТОЧКА --- */
+.create-post-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    animation: postPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s ease-in-out;
+}
+
+/* --- ТЕКСТ И ПОЛЯ --- */
+.post-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    display: block;
+}
+
+.auto-expand {
+    color: var(--bs-emphasis-color) !important;
+}
+
+.auto-expand::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 0.6;
+}
+
+.char-counter {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    background: var(--bs-secondary-bg);
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+
+/* --- МЕДИА ПРЕВЬЮ --- */
+#media-preview-container {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* --- АНИМАЦИИ --- */
+@keyframes postPop {
+    from { 
+        opacity: 0; 
+        transform: scale(0.95) translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+/* --- АДАПТИВНАЯ ТОЛЩИНА --- */
+
+/* Tablet (768px) */
+@media (min-width: 768px) {
+    .create-post-card {
+        min-height: 500px;
+    }
+}
+
+/* Laptop / Desktop */
+@media (min-width: 1024px) {
+    .create-post-card {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    }
+}
+
+/* Mobile S */
+@media (max-width: 375px) {
+    .card-header h6 {
+        font-size: 0.9rem;
+    }
+    .create-post-card {
+        border-radius: 0; /* На мобилках можно убрать скругления для эффекта приложения */
+    }
+}
+
+
+
+/* --- АДАПТИВ ШАПКИ КАРТОЧКИ (Mobile S/M) --- */
+
+@media (max-width: 400px) {
+    /* 1. Превращаем флекс в грид для точного позиционирования */
+    .card-header.d-flex {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr; /* Две колонки для кнопок */
+        grid-template-rows: auto auto; /* Две строки: заголовок и кнопки */
+        gap: 12px 5px;
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+
+    /* 2. Заголовок (Створити/Редагувати) — в первую строку на всю ширину */
+    .card-header h6 {
+        grid-column: 1 / span 2;
+        grid-row: 1;
+        text-align: center;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    /* 3. Кнопка "Скасувати" — во вторую строку слева */
+    .card-header a {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: start;
+        font-size: 0.85rem !important;
+    }
+
+    /* 4. Кнопка "Поширити/Зберегти" — во вторую строку справа */
+    .card-header button {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: end;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Совсем для малюток (320px) еще чуть подожмем */
+@media (max-width: 320px) {
+    .card-header h6 {
+        font-size: 0.9rem;
+    }
+    .card-header.d-flex {
+        padding: 10px 8px !important;
+    }
+}

@@ -1,0 +1,91 @@
+/* --- ПЕРЕМЕННЫЕ (если еще не в базовом) --- */
+:root {
+    --hybrid-grad: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
+}
+
+/* --- ОБЩИЕ СТИЛИ --- */
+.login-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+}
+
+.login-logo {
+    color: var(--bs-emphasis-color);
+    letter-spacing: -1px;
+}
+
+.logo-accent {
+    background: var(--hybrid-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* --- ПОЛЯ ВВОДА --- */
+.login-input {
+    background-color: var(--bs-tertiary-bg) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    color: var(--bs-emphasis-color) !important;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.login-input:focus {
+    border-color: var(--bs-secondary-color) !important;
+    box-shadow: none !important;
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+.login-input::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 0.6;
+}
+
+/* --- КНОПКА LOGIN (как в профиле) --- */
+.btn-login-submit {
+    background-color: var(--bs-emphasis-color) !important;
+    color: var(--bs-body-bg) !important;
+    border: none !important;
+    transition: opacity 0.2s ease, transform 0.1s ease !important;
+}
+
+.btn-login-submit:hover {
+    opacity: 0.85;
+    color: var(--bs-body-bg) !important;
+}
+
+.btn-login-submit:active {
+    transform: scale(0.97);
+}
+
+/* --- ССЫЛКИ И РАЗДЕЛИТЕЛИ --- */
+.or-divider-text {
+    background-color: var(--bs-body-bg);
+}
+
+.facebook-login-link {
+    color: #385185; /* Оставляем брендовый цвет FB */
+}
+
+.register-link {
+    color: #0095f6; /* Акцентный синий только для ссылки регистрации */
+}
+
+[data-bs-theme="dark"] .facebook-login-link {
+    color: #a1b8e7;
+}
+
+/* --- АНИМАЦИЯ --- */
+.card {
+    animation: loginFadeIn 0.5s ease-out;
+}
+
+@keyframes loginFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- MOBILE --- */
+@media (max-width: 320px) {
+    .card { padding: 1.5rem !important; }
+    .login-logo { font-size: 1.5rem !important; }
+}

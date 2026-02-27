@@ -1,0 +1,85 @@
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+
+<nav class="navbar navbar-expand-lg bg-body border-bottom sticky-top py-2">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'post-list' %}">
+            <div class="hybrid-logo-v3 me-2">
+                <span>SH</span>
+            </div>
+            <span class="hybrid-text-v3">Social Hybrit</span>
+        </a>
+        
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto align-items-center">
+                
+                <button class="btn btn-link nav-link me-2 p-0 border-0 shadow-none" id="themeToggle" type="button">
+                    <i class="bi bi-moon-stars-fill fs-5" id="themeIcon"></i>
+                </button>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'user-detail' user.pk %}" class="nav-link d-flex align-items-center me-3 p-0">
+                        <div class="user-avatar-v3" style="flex-shrink: 0;">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-body-secondary" style="width: 32px; height: 32px;">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" class="w-100 h-100" style="object-fit: cover;">
+                                {% else %}
+                                    <span class="fw-bold text-muted" style="font-size: 0.7rem;">{{ user.username|slice:":1"|upper }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="fw-bold small text-body ms-2 text-truncate" style="max-width: 90px;">{{ user.username }}</span>
+                    </a>
+                    <form action="{% url 'logout' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold" style="font-size: 0.75rem;">Вийти</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-sm btn-link text-decoration-none text-body fw-bold me-2">Увійти</a>
+                    <a href="{% url 'register' %}" class="btn btn-sm btn-dark rounded-pill px-4 fw-bold shadow-sm">Реєстрація</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<style>
+    :root { --hybrid-grad: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%); }
+    .hybrid-logo-v3 {
+        width: 35px; height: 35px; background: var(--hybrid-grad); border-radius: 8px;
+        display: flex; align-items: center; justify-content: center; color: white;
+        font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .hybrid-text-v3 {
+        font-family: 'Dancing Script', cursive; font-size: 1.7rem;
+        background: linear-gradient(to bottom, var(--bs-emphasis-color), var(--bs-secondary-color));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;
+    }
+    .user-avatar-v3 {
+        padding: 2px; background: var(--hybrid-grad); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; transition: transform 0.1s ease;
+    }
+    .user-avatar-v3:hover { transform: scale(0.95); }
+    [data-bs-theme="dark"] .btn-dark { background-color: #f8f9fa; color: #1a1a1a; }
+</style>
+
+<script>
+    const themeBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    const updateUI = (theme) => {
+        html.setAttribute('data-bs-theme', theme);
+        themeIcon.classList.replace(theme === 'dark' ? 'bi-moon-stars-fill' : 'bi-sun-fill', theme === 'dark' ? 'bi-sun-fill' : 'bi-moon-stars-fill');
+    };
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    updateUI(currentTheme);
+    themeBtn.addEventListener('click', () => {
+        const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        updateUI(newTheme);
+    });
+</script>

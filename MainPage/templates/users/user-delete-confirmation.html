@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %} 
+<link rel="stylesheet" href="{% static 'css/MainPage/user-delete-confirmation.css' %}">
+{% endblock extra_css %}
+
+{% block title %}Видалення акаунту{% endblock %}
+
+{% block content %}
+<div class="container-fluid d-flex align-items-center justify-content-center vh-100 position-fixed top-0 start-0 bg-page-overlay">
+    <div class="row justify-content-center w-100 mx-0">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4 d-flex justify-content-center">
+            
+            <div class="card delete-card border-1 shadow-sm overflow-hidden">
+                <div class="card-body p-4 p-md-5 text-center">
+                    
+                    <div class="mb-4">
+                        <div class="warning-icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle mx-auto">
+                            <i class="bi bi-person-x fs-1"></i>
+                        </div>
+                    </div>
+
+                    <h4 class="fw-bold mb-3 delete-title">Видалити акаунт?</h4>
+                    
+                    <div class="px-md-4 mb-4">
+                        <p class="text-muted small mb-0">
+                            Нам прикро, що ви йдете, <strong class="text-emphasis-custom">{{ cmuser_object.username }}</strong>. 
+                        </p>
+                        <p class="text-muted small">
+                            Ваші дописи, профіль та налаштування будуть видалені назавжди.
+                        </p>
+                    </div>
+
+                    <form method="POST" class="d-grid gap-2 px-md-5">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger-confirm fw-bold py-2 shadow-none border-0">
+                            Так, видалити назавжди
+                        </button>
+                        <a href="{% url 'user-detail' cmuser_object.pk %}" class="btn btn-cancel-confirm fw-bold py-2 border-0">
+                            Я передумав(-ла)
+                        </a>
+                    </form>
+                </div>
+                
+                <div class="card-footer delete-footer border-0 py-3 text-center">
+                    <span class="text-muted" style="font-size: 0.75rem;">SocialHybrit буде сумувати за вами 💔</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}
