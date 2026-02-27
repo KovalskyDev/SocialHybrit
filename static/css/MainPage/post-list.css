@@ -1,18 +1,70 @@
-/* --- Общие стили --- */
+/* --- ПЕРЕМЕННЫЕ ЦВЕТОВ (АДАПТИВНОСТЬ) --- */
+:root {
+    --post-bg: #ffffff;
+    --post-header-bg: #ffffff;
+    --post-border: #dbdbdb;
+    --post-text: #262626;
+    --post-text-muted: #8e8e8e;
+    --post-comment-bg: #fdfdfd;
+    --post-no-media-bg: #f8f9fa;
+    --body-bg: #fafafa;
+}
+
+[data-bs-theme="dark"] {
+    --post-bg: #121212;
+    --post-header-bg: #121212;
+    --post-border: #262626;
+    --post-text: #f5f5f5;
+    --post-text-muted: #a8a8a8;
+    --post-comment-bg: #1a1a1a;
+    --post-no-media-bg: #1a1a1a;
+    --body-bg: #000000;
+}
+
+/* --- ОБЩИЕ СТИЛИ --- */
 body { 
-    background-color: #fafafa !important; 
+    background-color: var(--body-bg) !important; 
+    color: var(--post-text);
+    transition: background-color 0.3s ease;
 }
 
 .post-item { 
     border-radius: 8px !important; 
     overflow: hidden; 
-    border: 1px solid #dbdbdb !important;
+    border: 1px solid var(--post-border) !important;
+    background-color: var(--post-bg) !important;
 }
 
-/* --- Медиа контент --- */
+.card-header {
+    background-color: var(--post-header-bg) !important;
+    border-bottom: 0 !important;
+}
+
+.post-author-name, .post-username {
+    color: var(--post-text) !important;
+    text-decoration: none;
+}
+
+/* --- МЕДИА КОНТЕНТ --- */
 .media-container {
     aspect-ratio: 1 / 1;
     background-color: #000;
+    width: 100%;
+    position: relative;
+}
+
+.post-no-media-bg {
+    background-color: var(--post-no-media-bg) !important;
+}
+
+.post-title-display {
+    color: var(--post-text) !important;
+    word-break: break-word !important; 
+    overflow-wrap: anywhere !important;
+    line-height: 1.3;
+    display: block;
+    padding: 20px !important; 
+    margin: 0 auto !important;
     width: 100%;
 }
 
@@ -21,7 +73,7 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
     transition: opacity 0.3s ease;
     z-index: 5;
     pointer-events: none;
@@ -33,32 +85,30 @@ body {
     }
 }
 
-/* --- Текстовый блок поста (Имя + Описание) --- */
+/* --- ТЕКСТОВЫЙ БЛОК (ОПИСАНИЕ И ОТВЕТЫ) --- */
 .post-text-container {
     line-height: 1.4;
     text-align: left !important;
-    word-break: break-word;
+    color: var(--post-text);
 }
 
-.post-caption, .reply-text, .post-title-display {
+.post-caption, .reply-text {
+    color: var(--post-text);
     overflow-wrap: anywhere !important;
     word-break: normal !important;
     user-select: text !important;
-    display: inline;
+    /* Сохраняем структуру текста без лишних дырок */
+    white-space: pre-line !important; 
+    display: inline-block;
+    width: 100%;
 }
 
-.about-short, .about-full {
-    display: inline;
-    text-align: left;
-}
-
-/* --- Кнопки "ще" и "приховати" --- */
+/* --- КНОПКИ "ЩЕ" И "ПРИХОВАТИ" --- */
 .read-more-btn, .read-less-btn {
     display: inline !important; 
     vertical-align: baseline;
     font-size: 0.85rem !important;
-    text-decoration: none !important;
-    color: #8e8e8e !important;
+    color: var(--post-text-muted) !important;
     font-weight: 600;
     margin-left: 4px !important;
     padding: 0 !important;
@@ -66,37 +116,35 @@ body {
     background: none !important;
     box-shadow: none !important;
     outline: none !important;
+    text-decoration: none !important;
 }
 
 .read-more-btn:hover, .read-less-btn:hover {
-    color: #262626 !important;
+    color: var(--post-text) !important;
 }
 
-/* --- Комментарии и Поле ввода (Textarea) --- */
-.post-comments-section .input-group {
-    width: 100%;
-    display: flex;
-    align-items: flex-end; /* Кнопка ОК будет прижата к низу при росте текста */
+/* --- КОММЕНТАРИИ --- */
+.post-comments-section {
+    background-color: var(--post-comment-bg) !important;
+    border-top: 1px solid var(--post-border) !important;
 }
 
 .comment-textarea {
     flex-grow: 1;
-    min-width: 0;
-    padding: 8px !important;
-    padding-left: 12px !important;
-    line-height: 1.4 !important;
-    min-height: 38px;
-    white-space: pre-wrap !important; /* РАЗРЕШАЕМ ПЕРЕНОС ТЕКСТА */
-    overflow-wrap: break-word !important;
-    word-break: break-word !important;
+    color: var(--post-text) !important;
+    padding: 8px 12px !important;
+    background: transparent !important;
+    border: none !important;
+    resize: none !important;
 }
 
-/* Скрываем скроллбар для эстетики, пока не превышен max-height */
-.comment-textarea::-webkit-scrollbar {
-    width: 0;
+.comment-textarea::placeholder {
+    color: var(--post-text-muted);
 }
 
-/* --- Интерфейс (Аватар, Лайки) --- */
+/* --- ИНТЕРФЕЙС И ИКОНКИ --- */
+.color-inherit { color: inherit !important; }
+
 .user-avatar-v3 {
     padding: 2px;
     background: linear-gradient(45deg, #8a2be2 0%, #00d2ff 50%, #ff00cc 100%);
@@ -106,11 +154,22 @@ body {
     justify-content: center;
 }
 
-.hover-red:hover { color: #ed4956; }
-.hover-blue:hover { color: #0095f6; }
+.bg-avatar-placeholder {
+    background-color: var(--post-no-media-bg) !important;
+    color: var(--post-text-muted);
+}
+
+.hover-red:hover { color: #ed4956 !important; }
+.hover-blue:hover { color: #0095f6 !important; }
 .text-danger { color: #ff3040 !important; }
 
-/* --- Анимация лайка --- */
+/* Фикс фокуса кнопок */
+.post-item .btn:focus, .post-item .btn:active {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* --- АНИМАЦИЯ ЛАЙКА --- */
 .like-heart-pop {
     position: absolute;
     top: 50%; left: 50%;
@@ -120,6 +179,7 @@ body {
     pointer-events: none;
     opacity: 0;
     color: #ff3040;
+    text-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
 .like-heart-pop.animate { animation: heartPop 0.8s ease-out; }
@@ -128,4 +188,14 @@ body {
     0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
     15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
     80% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; }
+}
+
+/* --- АДАПТИВНОСТЬ --- */
+@media (max-width: 576px) {
+    .post-item {
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+    .post-feed-container { padding: 0 !important; }
 }

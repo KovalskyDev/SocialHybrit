@@ -3,14 +3,19 @@
 
 {% block title %}Створити новий допис{% endblock %}
 
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/MainPage/post-create.css' %}">{% endblock extra_css %}
+
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-12 col-md-8 col-lg-6">
-        <div class="card border-1 border-light-subtle rounded-3 bg-white shadow-sm create-post-card overflow-hidden">
+<div class="row justify-content-center mt-3 mt-md-5 mx-0">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-6 px-1">
+        
+        <div class="card create-post-card border-1 shadow-sm overflow-hidden">
             
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <a href="{% url 'post-list' %}" class="text-decoration-none text-dark small">Скасувати</a>
-                <h6 class="m-0 fw-bold text-secondary">Створити допис</h6>
+            <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
+                <a href="{% url 'post-list' %}" class="text-decoration-none text-secondary small fw-bold">
+                    <i class="bi bi-x-lg me-1"></i> Скасувати
+                </a>
+                <h6 class="m-0 fw-bold">Створити допис</h6>
                 <button type="submit" form="post-form" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">
                     Поширити
                 </button>
@@ -20,49 +25,50 @@
                 {% csrf_token %}
                 
                 <div class="card-body p-0">
-                    <div id="media-preview-container" class="bg-black d-none">
-                        <div class="position-relative d-flex justify-content-center align-items-center" style="min-height: 300px;">
-                            <img id="image-preview" class="w-100 d-none" style="max-height: 500px; object-fit: contain;">
-                            <video id="video-preview" class="w-100 d-none" controls style="max-height: 500px;"></video>
+                    <div id="media-preview-container" class="bg-black d-none align-items-center justify-content-center" style="min-height: 350px;">
+                        <div class="position-relative w-100 text-center">
+                            <img id="image-preview" class="w-100 d-none" style="max-height: 600px; object-fit: contain;">
+                            <video id="video-preview" class="w-100 d-none" controls style="max-height: 600px;"></video>
                         </div>
                     </div>
 
-                    <div class="p-3 border-bottom d-flex align-items-center bg-white flex-wrap gap-2">
-                        <label for="id_media" id="media-label" class="btn btn-light border btn-sm fw-bold shadow-sm rounded-pill px-3">
-                            <i class="bi bi-plus-lg me-2" id="label-icon"></i>
-                            <span id="label-text">Додати</span>
+                    <div class="p-3 border-bottom d-flex align-items-center flex-wrap gap-2">
+                        <label for="id_media" class="btn btn-secondary btn-sm fw-bold rounded-pill px-3">
+                            <i class="bi bi-plus-lg me-2"></i>
+                            <span id="label-text">Додати фото/відео</span>
                         </label>
                         <input type="file" name="media" id="id_media" accept="image/*,video/*" class="d-none">
                         
                         <button type="button" id="remove-media" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-none">
-                            <i class="bi bi-trash me-1"></i>Видалити
+                            <i class="bi bi-trash me-1"></i> Видалити
                         </button>
 
-                        <span id="file-name-hint" class="small text-muted ms-md-auto w-100 w-md-auto mt-2 mt-md-0">Файл не обрано</span>
+                        <span id="file-name-hint" class="small text-muted ms-md-auto w-100 w-md-auto mt-2 mt-md-0 text-md-end">
+                            Файл не обрано
+                        </span>
                     </div>
 
-                    <div class="p-3 border-bottom bg-light-subtle bg-opacity-10">
-                        <label class="text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05rem; text-transform: uppercase;">Заголовок</label>
+                    <div class="p-3 border-bottom settings-sidebar">
+                        <label class="post-label mb-1">Заголовок</label>
                         <textarea name="name" maxlength="100" required id="id_name" 
-                                class="form-control border-0 shadow-none bg-transparent p-0 fw-bold auto-expand" 
-                                placeholder="Заголовок допису..." 
-                                style="font-size: 1.25rem; resize: none; overflow: hidden; min-height: 30px;"
-                                rows="1">{{ form.name.value|default:'' }}</textarea>
+                                  class="form-control border-0 shadow-none bg-transparent p-0 fw-bold auto-expand" 
+                                  placeholder="Заголовок вашої истории..." 
+                                  style="font-size: 1.25rem; resize: none; overflow: hidden; min-height: 35px;"
+                                  rows="1">{{ form.name.value|default:'' }}</textarea>
                     </div>
 
                     <div class="p-3">
-                        <label class="text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05rem; text-transform: uppercase;">Опис</label>
+                        <label class="post-label mb-1">Опис</label>
                         <textarea name="about" maxlength="2200" required id="id_about" 
-                                class="form-control border-0 shadow-none p-0 auto-expand" 
-                                placeholder="Про що ви думаєте?" 
-                                style="resize: none; overflow: hidden; font-size: 1rem; min-height: 150px;"
-                                rows="1">{{ form.about.value|default:'' }}</textarea>
+                                  class="form-control border-0 shadow-none p-0 bg-transparent auto-expand" 
+                                  placeholder="Про що ви думаєте?" 
+                                  style="resize: none; overflow: hidden; font-size: 1rem; min-height: 150px;"
+                                  rows="1">{{ form.about.value|default:'' }}</textarea>
                         
-                        <div class="d-flex justify-content-between align-items-center mt-1">
-                            <div id="media-error" class="text-danger small"></div>
-                            <div class="text-end">
-                                <span id="char-count" class="text-muted" style="font-size: 0.75rem;">0</span>
-                                <span class="text-muted" style="font-size: 0.75rem;"> / 2200</span>
+                        <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                            <div id="media-error" class="text-danger" style="font-size: 0.75rem;"></div>
+                            <div class="char-counter">
+                                <span id="char-count" class="fw-bold">0</span>/2200
                             </div>
                         </div>
                     </div>
@@ -71,13 +77,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    body { background-color: #fafafa !important; }
-    .form-control:focus { background-color: transparent !important; box-shadow: none !important; }
-    .create-post-card { animation: postPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes postPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-</style>
 
 {% block extra_js %}<script src="{% static 'js/MainPage/post-create.js' %}"></script>{% endblock extra_js %}
 {% endblock content %}

@@ -1,92 +1,104 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/user-detail.css' %}">{% endblock extra_css %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/MainPage/user-detail.css' %}">
+{% endblock extra_css %}
 
 {% block title %}Профіль Користувача | {{ cmuser_object.username }}{% endblock %}
 
 {% block content %}
-<div class="row mt-4 justify-content-center">
-    <div class="col-md-10 col-lg-8"> 
+<div class="row mt-2 mt-md-4 justify-content-center mx-0">
+    <div class="col-12 col-md-10 col-lg-9 col-xl-8 px-1 px-md-3"> 
         
-        <div class="row mb-5 align-items-center px-2">
-            <div class="col-4 col-md-3 text-center">
-                <div class="user-avatar-v3 shadow-sm" style="width: clamp(80px, 15vw, 150px); height: clamp(80px, 15vw, 150px); padding: 3px;">
-                    <div class="rounded-circle overflow-hidden bg-light d-flex align-items-center justify-content-center w-100 h-100 border border-2 border-white">
+        <div class="row mb-4 mb-md-5 align-items-center">
+            <div class="col-4 col-md-3 d-flex justify-content-center">
+                <div class="profile-avatar-v3 shadow-sm">
+                    <div class="avatar-inner rounded-circle overflow-hidden bg-body-secondary d-flex align-items-center justify-content-center w-100 h-100">
                         {% if cmuser_object.avatar %}
                             <img src="{{ cmuser_object.avatar.url }}" alt="{{ cmuser_object.username }}" class="w-100 h-100" style="object-fit: cover;">
                         {% else %}
-                            <span class="display-4 fw-bold text-muted">{{ cmuser_object.username|slice:":1"|upper }}</span>
+                            <span class="avatar-letter fw-bold text-muted">{{ cmuser_object.username|slice:":1"|upper }}</span>
                         {% endif %}
                     </div>
                 </div>
             </div>
             
-            <div class="col-8 col-md-9 ps-4">
-                <div class="d-flex flex-wrap align-items-center mb-3">
-                    <h2 class="fw-bold me-4 mb-2 mb-md-0" style="letter-spacing: -1px;">{{ cmuser_object.username }}</h2>
+            <div class="col-8 col-md-9 ps-3 ps-md-4">
+                <div class="d-flex align-items-center mb-2 mb-md-3 flex-wrap gap-2">
+                    <h2 class="fw-bold me-3 mb-0 user-title">{{ cmuser_object.username }}</h2>
                     
                     {% if user.is_authenticated %}
-                        {% if cmuser_object.pk == user.pk %}
-                            <div class="d-flex gap-2">
-                                <a href="{% url 'user-update' cmuser_object.pk %}" class="btn btn-sm btn-dark rounded-pill fw-bold px-3">Редагувати</a>
-                                <a href="{% url 'user-delete' cmuser_object.pk %}" class="btn btn-sm btn-outline-danger rounded-circle"><i class="bi bi-trash"></i></a>
-                            </div>
-                        {% else %}
-                            <button class="btn btn-sm btn-primary rounded-pill fw-bold px-4 shadow-none border-0" style="background-color: #00d2ff;">Підписатися</button>
-                        {% endif %}
+                        <div class="d-flex gap-2 align-items-center">
+                            {% if cmuser_object.pk == user.pk %}
+                                <a href="{% url 'user-update' cmuser_object.pk %}" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-3">Редагувати</a>
+                                <a href="{% url 'user-delete' cmuser_object.pk %}" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="bi bi-trash"></i></a>
+                            {% else %}
+                                <button class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">Стежити</button>
+                                <button class="btn btn-sm btn-secondary-custom rounded-pill fw-bold px-3">Повідомлення</button>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
 
-                <div class="d-flex mb-3 gap-3 gap-md-4">
-                    <div class="text-center text-md-start"><strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small d-block d-md-inline">дописів</span></div>
-                    <div class="text-center text-md-start"><strong>0</strong> <span class="text-muted small d-block d-md-inline">читачів</span></div>
-                    <div class="text-center text-md-start"><strong>0</strong> <span class="text-muted small d-block d-md-inline">відстежуваних</span></div>
+                <div class="d-flex mb-2 mb-md-3 gap-3 gap-md-4 stats-row">
+                    <div class="stat-item"><strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small">дописів</span></div>
+                    <div class="stat-item"><strong>0</strong> <span class="text-muted small">читачів</span></div>
+                    <div class="stat-item"><strong>0</strong> <span class="text-muted small">відстежуваних</span></div>
                 </div>
 
-                <div class="small d-none d-md-block">
+                <div class="small d-none d-sm-block profile-bio">
                     <div class="fw-bold fs-6">{{ cmuser_object.first_name }} {{ cmuser_object.last_name }}</div>
-                    {% if cmuser_object.age %}<span class="badge bg-light text-dark border fw-normal mb-1">Вік: {{ cmuser_object.age }}</span><br>{% endif %}
-                    <span class="text-secondary"><i class="bi bi-person-check me-1"></i>Стать: {{ cmuser_object.get_gender_display|default:"Не вказано" }}</span>
+                    {% if cmuser_object.age %}
+                        <span class="badge bg-body-secondary text-body border fw-normal mb-1">Вік: {{ cmuser_object.age }}</span><br>
+                    {% endif %}
+                    <span class="text-secondary small"><i class="bi bi-person-check me-1"></i>{{ cmuser_object.get_gender_display|default:"Стать не вказана" }}</span>
                 </div>
             </div>
-            <div class="col-12 d-md-none mt-3 px-3 small">
-                <div class="fw-bold">{{ cmuser_object.first_name }} {{ cmuser_object.last_name }}</div>
-                <span class="text-secondary">Стать: {{ cmuser_object.get_gender_display|default:"Не вказано" }}</span>
+
+            <div class="col-12 d-sm-none mt-3 px-2">
+                <div class="profile-bio-mobile">
+                    <div class="fw-bold">{{ cmuser_object.first_name }} {{ cmuser_object.last_name }}</div>
+                    {% if cmuser_object.age %}
+                        <span class="badge bg-body-secondary text-body border fw-normal my-1">Вік: {{ cmuser_object.age }}</span>
+                    {% endif %}
+                    <div class="text-secondary small">
+                        <i class="bi bi-person-check me-1"></i>{{ cmuser_object.get_gender_display|default:"Стать не вказана" }}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <ul class="nav nav-tabs border-0 justify-content-center mb-4" id="profileTabs">
+        <ul class="nav nav-tabs border-0 justify-content-center mb-3 mb-md-4" id="profileTabs">
             <li class="nav-item">
-                <a class="nav-link active border-0 border-top border-2 border-dark rounded-0 bg-transparent text-dark fw-bold small" href="#">
+                <a class="nav-link active border-0 border-top border-2 border-emphasis rounded-0 bg-transparent text-emphasis fw-bold small" href="#">
                     <i class="bi bi-grid-3x3 me-2"></i>ДОПИСИ
                 </a>
             </li>
         </ul>
 
-        <div class="row g-3 g-md-4 mt-2"> 
+        <div class="row g-1 g-md-3 mt-2 mb-5 mx-0"> 
             {% for post in cmuser_object.posts.all %}
                 <div class="col-4">
                     <a href="{% url 'post-list' %}#post-{{ post.pk }}" class="post-grid-item shadow-sm">
                         <div class="post-grid-content">
                             {% if post.media %}
                                 {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
-                                    <div class="video-icon-badge">
-                                        <i class="bi bi-play-fill"></i>
-                                    </div>
+                                    <div class="video-icon-badge"><i class="bi bi-play-fill"></i></div>
                                     <video src="{{ post.media.url }}" class="grid-media"></video>
                                 {% else %}
                                     <img src="{{ post.media.url }}" class="grid-media" loading="lazy">
                                 {% endif %}
                             {% else %}
-                                <div class="grid-media d-flex align-items-center justify-content-center p-3 text-center bg-custom-gradient">
-                                    <span class="post-grid-text fw-bold text-white small">{{ post.name }}</span>
+                                <div class="grid-media d-flex align-items-center justify-content-center p-2 p-md-3 text-center bg-custom-gradient">
+                                    <div class="post-grid-text-wrapper">
+                                        <span class="post-grid-text fw-bold text-white small">{{ post.name }}</span>
+                                    </div>
                                 </div>
                             {% endif %}
                             
                             <div class="post-grid-overlay">
-                                <div class="d-flex gap-3">
+                                <div class="d-flex gap-2 gap-md-3">
                                     <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
                                     <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
                                 </div>

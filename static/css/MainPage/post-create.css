@@ -1,0 +1,77 @@
+/* --- КАРТОЧКА --- */
+.create-post-card {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color-translucent) !important;
+    animation: postPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s ease-in-out;
+}
+
+/* --- ТЕКСТ И ПОЛЯ --- */
+.post-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    display: block;
+}
+
+.auto-expand {
+    color: var(--bs-emphasis-color) !important;
+}
+
+.auto-expand::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 0.6;
+}
+
+.char-counter {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    background: var(--bs-secondary-bg);
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+
+/* --- МЕДИА ПРЕВЬЮ --- */
+#media-preview-container {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* --- АНИМАЦИИ --- */
+@keyframes postPop {
+    from { 
+        opacity: 0; 
+        transform: scale(0.95) translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+/* --- АДАПТИВНАЯ ТОЛЩИНА --- */
+
+/* Tablet (768px) */
+@media (min-width: 768px) {
+    .create-post-card {
+        min-height: 500px;
+    }
+}
+
+/* Laptop / Desktop */
+@media (min-width: 1024px) {
+    .create-post-card {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    }
+}
+
+/* Mobile S */
+@media (max-width: 375px) {
+    .card-header h6 {
+        font-size: 0.9rem;
+    }
+    .create-post-card {
+        border-radius: 0; /* На мобилках можно убрать скругления для эффекта приложения */
+    }
+}
