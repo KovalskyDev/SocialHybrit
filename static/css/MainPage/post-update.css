@@ -52,3 +52,55 @@
         min-height: 250px;
     }
 }
+
+
+
+
+/* --- АДАПТИВ ШАПКИ КАРТОЧКИ (Mobile S/M) --- */
+
+@media (max-width: 400px) {
+    /* 1. Превращаем флекс в грид для точного позиционирования */
+    .card-header.d-flex {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr; /* Две колонки для кнопок */
+        grid-template-rows: auto auto; /* Две строки: заголовок и кнопки */
+        gap: 12px 5px;
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+
+    /* 2. Заголовок (Створити/Редагувати) — в первую строку на всю ширину */
+    .card-header h6 {
+        grid-column: 1 / span 2;
+        grid-row: 1;
+        text-align: center;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    /* 3. Кнопка "Скасувати" — во вторую строку слева */
+    .card-header a {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: start;
+        font-size: 0.85rem !important;
+    }
+
+    /* 4. Кнопка "Поширити/Зберегти" — во вторую строку справа */
+    .card-header button {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: end;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Совсем для малюток (320px) еще чуть подожмем */
+@media (max-width: 320px) {
+    .card-header h6 {
+        font-size: 0.9rem;
+    }
+    .card-header.d-flex {
+        padding: 10px 8px !important;
+    }
+}
