@@ -40,6 +40,22 @@ class CustomUser(AbstractUser):
         """Проверяет, является ли пользователь администратором через поле role."""
         return self.role == self.ROLE_ADMIN
     
+
+    @property
+    def followers_count(self):
+        """Подсчитывает сколько юзеров подписаны на тебя"""
+        return self.subscribers.count()
+
+    @property
+    def following_count(self):
+        """Подсчитывает сколько у юзера подписок на других"""
+        return self.subscriptions.count()
+
+    def is_following(self, user):
+        """Проверяет, подписан ли текущий юзер на указанного пользователя."""
+        return self.subscriptions.filter(following=user).exists()
+    
+
     def can_manage(self, user, allow_admin=True):
         """
         Проверяет, может ли конкретный юзер управлять этим постом.
@@ -122,3 +138,32 @@ class Reply(models.Model):
 
     def __str__(self):
         return f"{self.user.username} до {self.post.name[:20]}"
+    
+class Subscription(models.Model):
+    # Тот, НА КОГО подписались (звезда)
+    following = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name="subscribers" # ЭТО СПИСОК ТЕХ, КТО ПОДПИСАН НА ЮЗЕРА (Читачі)
+    )
+    # Тот, КТО подписался (фанат)
+    follower = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name="subscriptions" # ЭТО СПИСОК ТЕХ, НА КОГО ПОДПИСАН ЮЗЕР (Відстежувані)
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.follower.username} подписался на {self.following.username}"
+    
+    class Meta:
+        unique_together = ("following", "follower")
+        verbose_name = "Subscription"
+        verbose_name_plural = "Subscriptions"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.follower == self.following:
+            raise ValidationError("Нельзя подписаться на самого себя!")
+    

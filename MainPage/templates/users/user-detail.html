@@ -34,7 +34,18 @@
                                 <a href="{% url 'user-update' cmuser_object.pk %}" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-3">Редагувати</a>
                                 <a href="{% url 'user-delete' cmuser_object.pk %}" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="bi bi-trash"></i></a>
                             {% else %}
-                                <button class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">Стежити</button>
+                                <form action="{% url 'user-sub' cmuser_object.pk %}" method="post" class="m-0 like-form">
+                                    {% csrf_token %}
+                                    {% if is_sub %} 
+                                        <button type="submit" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">
+                                            Перестати стежити
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">
+                                            Стежити
+                                        </button>
+                                    {% endif %}
+                                </form> 
                                 <button class="btn btn-sm btn-secondary-custom rounded-pill fw-bold px-3">Повідомлення</button>
                             {% endif %}
                         </div>
@@ -43,8 +54,8 @@
 
                 <div class="d-flex mb-2 mb-md-3 gap-3 gap-md-4 stats-row">
                     <div class="stat-item"><strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small">дописів</span></div>
-                    <div class="stat-item"><strong>0</strong> <span class="text-muted small">читачів</span></div>
-                    <div class="stat-item"><strong>0</strong> <span class="text-muted small">відстежуваних</span></div>
+                    <div class="stat-item"><strong>{{ cmuser_object.followers_count }}</strong> <span class="text-muted small">читачів</span></div>
+                    <div class="stat-item"><strong>{{ cmuser_object.following_count }}</strong> <span class="text-muted small">відстежуваних</span></div>
                 </div>
 
                 <div class="small d-none d-sm-block profile-bio">

@@ -79,6 +79,17 @@ class DetailCustomUserView(DetailView):
     template_name = "users/user-detail.html"
     context_object_name = "cmuser_object"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        is_sub = False
+        if self.request.user.is_authenticated:
+            is_sub = self.request.user.is_following(self.object)
+        
+        context["is_sub"] = is_sub
+        return context
+
+
 class UpdateCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.CustomUser
     template_name = "users/user-update.html"
@@ -156,6 +167,20 @@ class PostLikeToggle(LoginRequiredMixin, View):
 
         return _redirect_to_post(request, post_id)
 
+
+class UserSubscribeToggle(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        target_user = get_object_or_404(models.CustomUser, pk=pk)
+
+        if request.user == target_user:
+            return redirect('user-detail', pk=target_user.pk)
+
+        subscription, created = models.Subscription.objects.get_or_create(following=target_user, follower=request.user)
+
+        if not created:
+            subscription.delete()
+
+        return redirect('user-detail', pk=target_user.pk)
 
 @login_required
 @require_POST
