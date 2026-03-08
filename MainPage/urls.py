@@ -2,11 +2,12 @@ from django.urls import path
 from .views import (ListPostView, CreatePostView, DeletePostView, UpdatePostView, 
                     CustomLoginView, CustomLogoutView, CustomRegisterView, password_change,
                     UpdateCustomUserView, DeleteCustomUserView, DetailCustomUserView,
-                    PostLikeToggle, add_reply, delete_reply)
+                    PostLikeToggle, UserSubscribeToggle, add_reply, delete_reply)
 urlpatterns = [
     path("login/", CustomLoginView.as_view(), name="login"),
     path("register/", CustomRegisterView.as_view(), name="register"),
     path("logout/", CustomLogoutView.as_view(), name="logout"),
+    path("password-change/", password_change, name="password-change"),
     
     path("", ListPostView.as_view(), name="post-list"),
     path("posts/create/", CreatePostView.as_view(), name="post-create"),
@@ -20,6 +21,5 @@ urlpatterns = [
     path("users/<int:pk>/", DetailCustomUserView.as_view(), name="user-detail"),
     path("users/<int:pk>/delete/", DeleteCustomUserView.as_view(), name="user-delete"),
     path("users/<int:pk>/update/", UpdateCustomUserView.as_view(), name="user-update"),
-
-    path("password-change/", password_change, name="password-change"),
+    path("users/<int:pk>/subscribe/", UserSubscribeToggle.as_view(), name="user-sub"),
 ]

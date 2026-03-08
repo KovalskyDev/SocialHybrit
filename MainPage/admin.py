@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Post, CustomUser, Like, Reply
+from .models import Post, CustomUser, Like, Reply, Subscription
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     pass
+
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     pass
@@ -13,5 +14,9 @@ class CustomUserAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Reply)
+class CustomUserAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Subscription)
 class CustomUserAdmin(admin.ModelAdmin):
     pass
