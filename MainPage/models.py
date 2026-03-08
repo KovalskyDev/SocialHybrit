@@ -76,10 +76,10 @@ class Post(models.Model):
     about = models.TextField(max_length=2200)
     media = models.FileField(upload_to="post_media/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="posts")
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, related_name="posts")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} НАПИСАНО {self.creator}"
 
     class Meta:
         verbose_name = "Post"
