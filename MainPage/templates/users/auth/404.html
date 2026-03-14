@@ -1,29 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}Сторінку не знайдено{% endblock %}
-
-{% block content %}
-<div class="error-container row justify-content-center align-items-center mx-0">
-    <div class="col-12 col-md-8 col-lg-6 text-center">
-        <div class="error-icon-wrapper mb-4">
-            <i class="bi bi-search error-icon"></i>
-        </div>
-        
-        <h2 class="fw-bold mb-3 error-title">На жаль, сторінку не знайдено</h2>
-        <p class="text-secondary mb-4 px-3 px-md-5 error-text">
-            Можливо, ви ввели неправильні дані або посилання, за яким ви перейшли, застаріло.
-        </p>
-        
-        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
-            <a href="{% url 'post-list' %}" class="btn btn-error-primary fw-bold px-4 rounded-pill">
-                На головну
-            </a>
-            <button onclick="history.back()" class="btn btn-error-link fw-bold">
-                Повернутися назад
-            </button>
-        </div>
-    </div>
-</div>
 <style>
     /* Контейнер и анимация (общие для ошибок) */
 .error-container {
@@ -94,4 +70,29 @@
     }
 }
 </style>
+
+{% block title %}Сторінку не знайдено{% endblock %}
+
+{% block content %}
+<div class="error-container row justify-content-center align-items-center mx-0">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <div class="error-icon-wrapper mb-4">
+            <i class="bi bi-search error-icon"></i>
+        </div>
+        
+        <h2 class="fw-bold mb-3 error-title">На жаль, сторінку не знайдено</h2>
+        <p class="text-secondary mb-4 px-3 px-md-5 error-text">
+            Можливо, ви ввели неправильні дані або посилання, за яким ви перейшли, застаріло.
+        </p>
+        
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
+            <a href="{% url 'post-list' %}" class="btn btn-error-primary fw-bold px-4 rounded-pill">
+                На головну
+            </a>
+            <button onclick="history.back()" class="btn btn-error-link fw-bold">
+                Повернутися назад
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}

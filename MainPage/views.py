@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.views import LoginView, LogoutView
@@ -14,6 +16,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Case, When, Value, IntegerField
 
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import EmptyPage
 
 from .mixins import SmartUserIsOwnerMixin
 from MainPage import models
@@ -93,7 +96,6 @@ class DetailCustomUserView(DetailView):
         context["is_sub"] = is_sub
         return context
 
-
 class UpdateCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.CustomUser
     template_name = "users/user-update.html"
@@ -118,42 +120,68 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('post-list') + f'#post-{self.object.pk}'
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 class ListPostView(ListView):
     model = models.Post
     template_name = "posts/post-list.html"
     context_object_name = "posts_objects"
-
-    def get_context_data(self, **kwargs):
-        '''Добавление лайкнутых постов в контекст один раз
-        для того чтобы не делать много запросов в БД'''
-        context = super().get_context_data(**kwargs)
-
-        if self.request.user.is_authenticated:
-            # получаем список ID всех лайкнутых постов
-            context['user_liked_posts_ids'] = models.Like.objects.filter(
-                user=self.request.user
-            ).values_list('post_id', flat=True)
-        return context
+    paginate_by = 7
 
     def get_queryset(self):
         user = self.request.user
+        # Базовый запрос
+        queryset = models.Post.objects.all().select_related('creator')
         
-        #Если юзер не залогинен — просто отдаем все посты по дате
-        if not user.is_authenticated:
-            return models.Post.objects.all().order_by('-created_at')
+        if user.is_authenticated:
+            following_ids = user.subscriptions.values_list('following_id', flat=True)
+            fresh_threshold = timezone.now() - timedelta(days=3)
+            
+            queryset = queryset.annotate(
+                priority=Case(
+                    When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(1)),
+                    When(creator_id__in=following_ids, then=Value(2)),
+                    default=Value(3),
+                    output_field=IntegerField(),
+                )
+            ).order_by('priority', '-created_at', '-id') # Тройная сортировка!
+        else:
+            queryset = queryset.order_by('-created_at', '-id')
+            
+        return queryset
 
-        #Если залогинен — строим умную ленту
-        following_ids = user.subscriptions.values_list('following_id', flat=True)
-        fresh_threshold = timezone.now() - timedelta(days=3)
+    def get(self, request, *args, **kwargs):
+        # Если это AJAX запрос
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            posts_list = self.get_queryset()
+            paginator = Paginator(posts_list, self.paginate_by)
+            page_number = request.GET.get('page')
 
-        return models.Post.objects.annotate(
-            priority=Case(
-                When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(1)),
-                When(creator_id__in=following_ids, then=Value(2)),
-                default=Value(3),
-                output_field=IntegerField(),
-            )
-        ).order_by('priority', '-created_at').select_related('creator')
+            try:
+                page_obj = paginator.get_page(page_number)
+            except (EmptyPage, PageNotAnInteger):
+                return JsonResponse({'html': '', 'has_next': False})
+
+            # Получаем ID лайков для этой конкретной страницы
+            user_liked_posts_ids = []
+            if request.user.is_authenticated:
+                user_liked_posts_ids = models.Like.objects.filter(
+                    user=request.user, 
+                    post__in=page_obj # Фильтруем лайки только для постов на этой странице
+                ).values_list('post_id', flat=True)
+
+            html = render_to_string('posts/includes/post_items_loop.html', {
+                'posts_objects': page_obj,
+                'user_liked_posts_ids': user_liked_posts_ids,
+                'user': request.user
+            }, request=request)
+
+            return JsonResponse({
+                'html': html,
+                'has_next': page_obj.has_next()
+            })
+
+        return super().get(request, *args, **kwargs)
 
 
 class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
@@ -177,20 +205,24 @@ class DeletePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView):
 class PostLikeToggle(LoginRequiredMixin, View):
     def post(self, request, pk):
         post = get_object_or_404(models.Post, pk=pk)
-        post_id = post.id
-        # Получаем тип действия из скрытого поля формы
         action = request.POST.get('action', 'toggle')
 
         if action == 'like_only':
-            # Только создаем, если его еще нет
             models.Like.objects.get_or_create(post=post, user=request.user)
+            liked = True
         else:
-            # Обычный toggle для кнопки
             like, created = models.Like.objects.get_or_create(post=post, user=request.user)
             if not created:
                 like.delete()
+                liked = False
+            else:
+                liked = True
 
-        return _redirect_to_post(request, post_id)
+        # Отдаем только нужные данные
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': post.likes_count, # Наш @property из модели
+        })
 
 
 class UserSubscribeToggle(LoginRequiredMixin, View):

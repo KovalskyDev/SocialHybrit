@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-
 {% load static %}
-{% block extra_css %} <link rel="stylesheet" href="{% static 'css/MainPage/post-update.css' %}">{% endblock extra_css %}
 
+{% block extra_css %} 
+    <link rel="stylesheet" href="{% static 'css/MainPage/post-update.css' %}">
+{% endblock extra_css %}
 
 {% block title %}Редагувати Допис{% endblock %}
 
@@ -89,6 +90,8 @@
         </div>
     </div>
 </div>
-
-{% block extra_js %}<script src="{% static 'js/MainPage/post-update.js' %}"></script>{% endblock extra_js %}
 {% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'js/MainPage/post-update.js' %}"></script>
+{% endblock extra_js %}

@@ -190,6 +190,41 @@ body {
     80% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; }
 }
 
+
+/* Анимация пульсации маленького сердечка при клике */
+.like-button i {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: inline-block;
+}
+
+.like-button:active i {
+    transform: scale(1.4); /* Сердце увеличивается при нажатии */
+}
+
+/* Эффект появления красного цвета */
+.bi-heart-fill.text-danger {
+    animation: heartBeat 0.3s ease-out;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Плавная смена цифр */
+.likes-count {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+/* Класс, который мы будем вешать через JS на долю секунды */
+.likes-count.updating {
+    opacity: 0;
+    transform: translateY(-3px); /* Число слегка "подпрыгивает" */
+}
+
+
 /* --- АДАПТИВНОСТЬ --- */
 @media (max-width: 576px) {
     .post-item {
