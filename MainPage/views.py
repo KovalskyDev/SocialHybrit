@@ -252,8 +252,14 @@ def add_reply(request, pk):
         reply.post = post
         reply.user = request.user
         reply.save()
-    else:
-        pass
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'text': reply.text,
+                'username': reply.user.username,
+                'user_id': reply.user.pk,
+                'pk': reply.pk,
+            })
 
     return _redirect_to_post(request=request, post_id=post.id)
 
@@ -263,11 +269,16 @@ def delete_reply(request, pk):
     post_id = reply.post.id
     
     if request.user == reply.user or request.user == reply.post.creator or request.user.is_admin:
+        reply_id = reply.pk  # Сохраняем ID перед удалением
         reply.delete()
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success', 'reply_id': reply_id})
     else:
         raise PermissionDenied
 
     return _redirect_to_post(request=request, post_id=post_id)
+
 
 def _redirect_to_post(request, post_id):
     referer = request.META.get('HTTP_REFERER')
