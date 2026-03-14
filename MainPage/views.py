@@ -11,12 +11,16 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import Case, When, Value, IntegerField
 
 from django.core.exceptions import PermissionDenied
 
 from .mixins import SmartUserIsOwnerMixin
 from MainPage import models
 from MainPage import forms
+
+from datetime import timedelta
+from django.utils import timezone
 
 
 def error_403(request, exception):
@@ -130,6 +134,27 @@ class ListPostView(ListView):
                 user=self.request.user
             ).values_list('post_id', flat=True)
         return context
+
+    def get_queryset(self):
+        user = self.request.user
+        
+        #Если юзер не залогинен — просто отдаем все посты по дате
+        if not user.is_authenticated:
+            return models.Post.objects.all().order_by('-created_at')
+
+        #Если залогинен — строим умную ленту
+        following_ids = user.subscriptions.values_list('following_id', flat=True)
+        fresh_threshold = timezone.now() - timedelta(days=3)
+
+        return models.Post.objects.annotate(
+            priority=Case(
+                When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(1)),
+                When(creator_id__in=following_ids, then=Value(2)),
+                default=Value(3),
+                output_field=IntegerField(),
+            )
+        ).order_by('priority', '-created_at').select_related('creator')
+
 
 class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.Post
