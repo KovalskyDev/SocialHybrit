@@ -78,7 +78,9 @@ class CustomRegisterView(FormView):
         login(self.request, user)
         return super().form_valid(form)
 
-
+"""
+CASTOMUSER CBV
+"""
 class DeleteCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView):
     model = models.CustomUser
     template_name = "users/user-delete-confirmation.html"
@@ -111,7 +113,9 @@ class UpdateCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView
     def get_success_url(self):
         return reverse("user-detail", kwargs={"pk": self.object.pk})
     
-
+"""
+POST CBV
+"""
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = models.Post
     template_name = "posts/post-create.html"
@@ -121,10 +125,6 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.creator = self.request.user
         return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse('post-list') + f'#post-{self.object.pk}'
-
 
 class ListPostView(ListView):
     model = models.Post
@@ -140,12 +140,14 @@ class ListPostView(ListView):
         if user.is_authenticated:
             following_ids = user.subscriptions.values_list('following_id', flat=True)
             fresh_threshold = timezone.now() - timedelta(days=3)
+            now_threshold = timezone.now() - timedelta(seconds=5)
             
             queryset = queryset.annotate(
                 priority=Case(
-                    When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(1)),
-                    When(creator_id__in=following_ids, then=Value(2)),
-                    default=Value(3),
+                    When(creator_id=user.id, created_at__gte=now_threshold, then=Value(1)),
+                    When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(2)),
+                    When(creator_id__in=following_ids, then=Value(3)),
+                    default=Value(4),
                     output_field=IntegerField(),
                 )
             ).order_by('priority', '-created_at', '-id')
@@ -187,24 +189,19 @@ class ListPostView(ListView):
 
         return super().get(request, *args, **kwargs)
 
-
 class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.Post
+    form_class = forms.PostForm
     template_name = "posts/post-update.html"
     context_object_name = "post_object"
-    form_class = forms.PostForm
-    
-    def get_success_url(self):
-        return reverse('post-list') + f'#post-{self.object.pk}'
+    success_url = reverse_lazy('post-list')
 
 class DeletePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView):
     model = models.Post
     template_name = "posts/post-delete-confirmation.html"
     success_url = reverse_lazy("post-list")
     context_object_name = "post_object"
-
-    def get_success_url(self):
-        return reverse_lazy('post-list')
+    success_url = reverse_lazy('post-list')
 
 class PostLikeToggle(LoginRequiredMixin, View):
     def post(self, request, pk):
