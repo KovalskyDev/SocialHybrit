@@ -221,7 +221,27 @@ body {
 /* Класс, который мы будем вешать через JS на долю секунды */
 .likes-count.updating {
     opacity: 0;
-    transform: translateY(-3px); /* Число слегка "подпрыгивает" */
+    transform: translateY(-0.5px); /* Число слегка "подпрыгивает" */
+}
+
+/* --- СТИЛЬ ЗАГЛУШКИ УДАЛЕННОГО ПОСТА --- */
+.deleted-post-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: var(--post-no-media-bg) !important;
+    color: var(--post-text-muted) !important;
+    border: 1px dashed var(--post-border);
+    border-radius: 8px;
+    text-align: center;
+    padding: 20px;
+}
+
+.deleted-post-placeholder i {
+    color: var(--post-text-muted);
+    opacity: 0.6;
 }
 
 

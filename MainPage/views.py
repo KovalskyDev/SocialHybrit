@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.utils.dateparse import parse_datetime
 
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.views import LoginView, LogoutView
@@ -12,11 +13,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
+
 from django.views.decorators.http import require_POST
 from django.db.models import Case, When, Value, IntegerField
+from django.db.models import Count
 
 from django.core.exceptions import PermissionDenied
+
 from django.core.paginator import EmptyPage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .mixins import SmartUserIsOwnerMixin
 from MainPage import models
@@ -120,7 +125,6 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('post-list') + f'#post-{self.object.pk}'
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class ListPostView(ListView):
     model = models.Post
@@ -144,7 +148,7 @@ class ListPostView(ListView):
                     default=Value(3),
                     output_field=IntegerField(),
                 )
-            ).order_by('priority', '-created_at', '-id') # Тройная сортировка!
+            ).order_by('priority', '-created_at', '-id')
         else:
             queryset = queryset.order_by('-created_at', '-id')
             
@@ -286,3 +290,49 @@ def _redirect_to_post(request, post_id):
         base_url = referer.split('#')[0]
         return redirect(f"{base_url}#post-{post_id}")
     return redirect("post-list")
+
+
+def get_social_updates(request):
+    raw_ids = request.GET.get('ids', '').split(',')
+    post_ids = [int(i) for i in raw_ids if i.isdigit()]
+    
+    last_check_raw = request.GET.get('last_check')
+    last_check = parse_datetime(last_check_raw) if last_check_raw else None
+    
+    data = {
+        'stats': {},
+        'new_replies': {},
+        'new_posts_count': 0
+    }
+
+    if not post_ids or not last_check:
+        return JsonResponse(data)
+
+    # Предзагружаем комменты сразу для всех постов одним махом (prefetch_related)
+    # Это сэкономит тебе кучу ресурсов CPU
+    posts = models.Post.objects.filter(id__in=post_ids).annotate(
+        l_count=Count('likes', distinct=True),
+        r_count=Count('replies', distinct=True)
+    ).prefetch_related('replies')
+
+    for post in posts:
+        # 1. Пишем статы И список ID комментов для КАЖДОГО поста отдельно
+        data['stats'][post.id] = {
+            'likes': post.l_count, 
+            'replies': post.r_count,
+            'active_replies': list(post.replies.values_list('id', flat=True)) # Теперь внутри!
+        }
+        
+        # 2. Новые комменты
+        replies_query = post.replies.filter(created_at__gt=last_check)
+        if request.user.is_authenticated:
+            replies_query = replies_query.exclude(user=request.user)
+
+        if replies_query.exists():
+            data['new_replies'][post.id] = render_to_string(
+                'posts/includes/replies_ajax.html',
+                {'replies': replies_query, 'user': request.user},
+                request=request
+            )
+            
+    return JsonResponse(data)

@@ -59,10 +59,23 @@ function toggleComments(postId) {
     section.style.display = (section.style.display === 'none' || section.style.display === '') ? 'block' : 'none';
 }
 
-// 4. ГЛАВНАЯ ИНИЦИАЛИЗАЦИЯ
+// Функция плавного обновления чисел
+function updateValueWithAnim(el, newValue) {
+    if (el && el.innerText != newValue) {
+        el.style.transition = "opacity 0.2s ease";
+        el.style.opacity = "0"; 
+        setTimeout(() => {
+            el.innerText = newValue;
+            el.style.opacity = "1";
+        }, 200);
+    }
+}
+
+// --- 4. ГЛАВНАЯ ИНИЦИАЛИЗАЦИЯ ---
 document.addEventListener("DOMContentLoaded", function() {
     console.log("SocialHybrit JS: Full System Initialized");
-
+    
+    let lastCheckTime = new Date().toISOString();
     let page = 1;
     let emptyPage = false;
     let blockRequest = false;
@@ -71,11 +84,93 @@ document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById('post-container');
     const loader = document.getElementById('loader');
 
+    // --- РЕАЛТАЙМ ОБНОВЛЕНИЯ (HEARTBEAT) ---
+    async function startSocialHeartbeat() {
+        setInterval(async () => {
+            if (document.hidden) return;
+
+            const postElements = document.querySelectorAll('.post-item');
+            const ids = Array.from(postElements).map(el => el.dataset.postId).filter(id => id);
+            if (ids.length === 0) return;
+
+            try {
+                const response = await fetch(`/api/get_updates/?ids=${ids.join(',')}&last_check=${lastCheckTime}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                
+                // 1. ЛОГИКА УДАЛЕНИЯ ПОСТОВ
+                ids.forEach(id => {
+                    if (!data.stats[id]) { 
+                        const postEl = document.getElementById(`post-${id}`);
+                        if (postEl && !postEl.classList.contains('is-deleted')) {
+                            postEl.style.height = postEl.offsetHeight + 'px';
+                            postEl.classList.add('is-deleted');
+                            postEl.innerHTML = `
+                                <div class="deleted-post-placeholder text-center p-4">
+                                    <i class="bi bi-trash3 fs-2 mb-2"></i>
+                                    <p class="fw-bold mb-0">Цей пост був видалений</p>
+                                </div>`;
+                        }
+                    }
+                });
+
+                lastCheckTime = new Date().toISOString();
+
+                // 2. ВСТАВКА НОВЫХ КОММЕНТАРИЕВ
+                for (const [postId, html] of Object.entries(data.new_replies)) {
+                    const list = document.querySelector(`#comments-section-${postId} .replies-list`);
+                    if (list) {
+                        const emptyMsg = list.querySelector('.empty-replies-msg');
+                        if (emptyMsg) emptyMsg.remove();
+                        
+                        list.insertAdjacentHTML('beforeend', html);
+                        
+                        list.querySelectorAll('.reply-item[style*="opacity: 0"]').forEach(el => {
+                            setTimeout(() => { 
+                                el.style.opacity = '1'; 
+                                el.style.transform = 'translateX(0)'; 
+                            }, 50);
+                        });
+                    }
+                }
+
+                // 3. ОБНОВЛЕНИЕ СЧЕТЧИКОВ И ТИХАЯ ЧИСТКА КОММЕНТОВ
+                for (const [id, stat] of Object.entries(data.stats)) {
+                    const lCount = document.getElementById(`likes-count-${id}`);
+                    const rCount = document.getElementById(`replies-count-${id}`);
+                    if (lCount) updateValueWithAnim(lCount, stat.likes);
+                    if (rCount) updateValueWithAnim(rCount, stat.replies);
+
+                    // Тихая синхронизация списка комментов (только если плашка закрыта)
+                    const section = document.getElementById('comments-section-' + id);
+                    if (section && (section.style.display === 'none' || section.style.display === '')) {
+                        const list = section.querySelector('.replies-list');
+                        if (list && stat.active_replies) {
+                            const currentItems = list.querySelectorAll('.reply-item');
+                            currentItems.forEach(reply => {
+                                if (!reply.id) return; // ЗАЩИТА ОТ "ДЫР"
+                                const rId = parseInt(reply.id.replace('reply-', '')); 
+                                if (!isNaN(rId) && !stat.active_replies.includes(rId)) {
+                                    reply.remove();
+                                }
+                            });
+
+                            // Возвращаем заглушку, только если реально всё удалилось
+                            if (list.querySelectorAll('.reply-item').length === 0 && !list.querySelector('.empty-replies-msg')) {
+                                list.innerHTML = '<p class="empty-replies-msg small text-muted text-center py-2">Ще немає коментарів...</p>';
+                            }
+                        }
+                    }
+                }
+            } catch (e) { console.error("Heartbeat error:", e); }
+        }, 3000); // Вернула твои 3 секунды
+    }
+
+    startSocialHeartbeat();
+
     // --- БЕСКОНЕЧНЫЙ СКРОЛЛ ---
     const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && !blockRequest && !emptyPage) {
-            loadMorePosts();
-        }
+        if (entries[0].isIntersecting && !blockRequest && !emptyPage) loadMorePosts();
     }, { threshold: 0.1, rootMargin: "200px" });
 
     if (sentinel) observer.observe(sentinel);
@@ -84,39 +179,30 @@ document.addEventListener("DOMContentLoaded", function() {
         blockRequest = true;
         page++;
         if (loader) loader.classList.remove('d-none');
-
         try {
-            const response = await fetch(`?page=${page}`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            if (!response.ok) { emptyPage = true; return; }
+            const response = await fetch(`?page=${page}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const data = await response.json();
-
             if (!data.html || data.html.trim() === "") {
                 emptyPage = true;
             } else {
                 container.insertAdjacentHTML('beforeend', data.html);
                 if (!data.has_next) emptyPage = true;
-                else setTimeout(() => { blockRequest = false; }, 200);
+                else setTimeout(() => { blockRequest = false; }, 100);
             }
-        } catch (e) {
-            console.error("Pagination error:", e);
-            blockRequest = false;
-        } finally {
+        } catch (e) { blockRequest = false; } finally {
             if (loader) loader.classList.add('d-none');
         }
     }
 
-    // --- ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЯ (AJAX) ---
+    // --- ОТПРАВКА КОММЕНТАРИЯ ---
     async function handleCommentSubmit(form) {
         const url = form.action;
         const formData = new FormData(form);
-        const postItem = form.closest('.post-item');
-        const replyList = postItem.querySelector('.replies-list');
+        const replyList = form.closest('.post-item').querySelector('.replies-list');
         const textarea = form.querySelector('textarea');
         const submitBtn = form.querySelector('button[type="submit"]');
 
-        if (!textarea.value.trim()) return;
+        if (!textarea.value.trim() || (submitBtn && submitBtn.disabled)) return;
         if (submitBtn) submitBtn.disabled = true;
 
         try {
@@ -131,17 +217,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (response.ok) {
                 const data = await response.json();
-                
-                // Убираем заглушку "Нет комментов"
-                const emptyMsg = replyList.querySelector('p.text-muted');
+                const emptyMsg = replyList.querySelector('.empty-replies-msg');
                 if (emptyMsg) emptyMsg.remove();
 
-                // Создаем HTML нового коммента с анимацией
                 const newReplyHtml = `
-                    <div class="reply-item d-flex justify-content-between align-items-start mb-2" style="opacity: 0; transform: translateX(-10px); transition: all 0.3s ease;">
+                    <div class="reply-item d-flex justify-content-between align-items-start mb-2" id="reply-${data.pk}" style="opacity: 0; transform: translateX(-10px); transition: all 0.3s ease;">
                         <div style="min-width: 0;">
-                            <span class="fw-bold me-1 small">${data.username}</span>
-                            <span class="text-muted ms-1" style="font-size: 0.85rem;">now</span>
+                            <a href="/users/${data.user_id}/" class="text-decoration-none color-inherit">
+                                <span class="fw-bold me-1 small">${data.username}</span>
+                            </a>
+                            <span class="text-muted ms-1" style="font-size: 0.85rem;">щойно</span>
                             <span class="small reply-text d-block">${data.text}</span>
                         </div>
                         <a href="/replies/${data.pk}/delete/" class="delete-reply-btn text-muted ms-2 no-select">
@@ -150,58 +235,44 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>`;
                 
                 replyList.insertAdjacentHTML('beforeend', newReplyHtml);
-                
-                // Запуск анимации появления
-                const newElem = replyList.lastElementChild;
                 setTimeout(() => {
-                    newElem.style.opacity = '1';
-                    newElem.style.transform = 'translateX(0)';
+                    const el = replyList.lastElementChild;
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateX(0)';
                 }, 10);
 
                 form.reset();
                 textarea.style.height = 'auto';
+                lastCheckTime = new Date().toISOString();
             }
-        } catch (error) {
-            console.error('Comment error:', error);
-        } finally {
+        } catch (error) { console.error('Comment error:', error); } finally {
             if (submitBtn) submitBtn.disabled = false;
         }
     }
 
-    // --- ДЕЛЕГИРОВАНИЕ ВСЕХ СОБЫТИЙ КЛИКА ---
+    // --- ДЕЛЕГИРОВАНИЕ ---
     document.addEventListener('click', async function(e) {
-        // 1. Кнопка "Читать далее"
-        if (e.target.classList.contains('read-more-btn')) {
-            const p = e.target.closest('.post-caption');
-            p.querySelector('.about-short').classList.add('d-none');
-            p.querySelector('.about-full').classList.remove('d-none');
-        }
+        const target = e.target;
         
-        // 2. Кнопка "Скрыть"
-        if (e.target.classList.contains('read-less-btn')) {
-            const p = e.target.closest('.post-caption');
-            p.querySelector('.about-full').classList.add('d-none');
-            p.querySelector('.about-short').classList.remove('d-none');
-            p.closest('.post-item').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Свернуть/развернуть текст
+        if (target.classList.contains('read-more-btn') || target.classList.contains('read-less-btn')) {
+            const p = target.closest('.post-caption');
+            p.querySelector('.about-short').classList.toggle('d-none');
+            p.querySelector('.about-full').classList.toggle('d-none');
+            if (target.classList.contains('read-less-btn')) {
+                p.closest('.post-item').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
 
-        // 3. Кнопка УДАЛЕНИЯ комментария (AJAX)
-        const deleteBtn = e.target.closest('.delete-reply-btn');
+        // Удаление коммента
+        const deleteBtn = target.closest('.delete-reply-btn');
         if (deleteBtn) {
             e.preventDefault();
-            e.stopImmediatePropagation(); // Защита от двойного окна
-
             if (!confirm('Видалити цей коментар?')) return;
-
-            const url = deleteBtn.href;
             const replyItem = deleteBtn.closest('.reply-item');
-
             try {
-                const response = await fetch(url, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
+                const response = await fetch(deleteBtn.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 if (response.ok) {
-                    replyItem.style.transition = 'all 0.4s ease';
                     replyItem.style.opacity = '0';
                     replyItem.style.transform = 'translateX(30px)';
                     setTimeout(() => { replyItem.remove(); }, 400);
@@ -210,28 +281,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- ОБРАБОТКА ФОРМ (ДОБАВЛЕНИЕ КОММЕНТА) ---
     document.addEventListener('submit', function(e) {
-        // Ищем форму по классу ajax-reply-form
-        const form = e.target.closest('.ajax-reply-form') || (e.target.action && e.target.action.includes('create'));
-        if (form && typeof form !== 'string') {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            handleCommentSubmit(e.target);
-        }
+        const form = e.target.closest('.ajax-reply-form');
+        if (form) { e.preventDefault(); handleCommentSubmit(form); }
     });
 
-    // Двойной клик (Лайк)
     document.addEventListener('dblclick', function(e) {
         const wrapper = e.target.closest('.media-wrapper');
         if (wrapper) {
             window.getSelection().removeAllRanges();
             const heart = wrapper.querySelector('.like-heart-pop');
-            if (heart) {
-                heart.classList.remove('animate');
-                void heart.offsetWidth;
-                heart.classList.add('animate');
-            }
+            if (heart) { heart.classList.remove('animate'); void heart.offsetWidth; heart.classList.add('animate'); }
             const card = wrapper.closest('.post-item');
             const form = card.querySelector('.ajax-like-form');
             const input = card.querySelector('.like-action-input');
@@ -242,7 +302,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Авто-высота textarea
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('comment-textarea')) {
             e.target.style.height = 'auto';
@@ -250,14 +309,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Отправка по Enter (без Shift)
     document.addEventListener('keydown', function(e) {
         if (e.target.classList.contains('comment-textarea') && e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            const form = e.target.closest('form');
-            if (e.target.value.trim() !== "") {
-                handleCommentSubmit(form);
-            }
+            handleCommentSubmit(e.target.closest('form'));
         }
     });
 });

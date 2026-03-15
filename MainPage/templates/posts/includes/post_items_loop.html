@@ -1,5 +1,5 @@
 {% for post in posts_objects %}
-    <article id="post-{{ post.pk }}" class="card mb-4 post-item border-1 shadow-sm">
+    <article id="post-{{ post.pk }}" class="card mb-4 post-item border-1 shadow-sm" data-post-id="{{ post.pk }}">
         
         <div class="card-header border-0 py-3 d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
@@ -74,13 +74,14 @@
                             </button>
                         </form> 
                         <span class="fw-bold small likes-count" id="likes-count-{{ post.pk }}">{{ post.likes_count }}</span>
+                        
                     </div>
                     
                     <div class="d-flex align-items-center gap-1">
                         <button class="btn p-0 border-0 shadow-none d-flex align-items-center bg-transparent color-inherit" onclick="toggleComments('{{ post.pk }}')">
                             <i class="bi bi-chat fs-4 hover-blue"></i>
                         </button>
-                        <span class="fw-bold small">{{ post.replies.count }}</span>
+                        <span class="fw-bold small" id="replies-count-{{ post.pk }}">{{ post.replies.count }}</span>
                     </div>
 
                     <i class="bi bi-send fs-4 cursor-pointer"></i>
@@ -97,7 +98,7 @@
         <div id="comments-section-{{ post.pk }}" class="post-comments-section border-top" style="display: none;">
             <div class="replies-list px-3 pt-3">
                 {% for reply in post.replies.all %}
-                    <div class="reply-item d-flex justify-content-between align-items-start mb-2">
+                    <div id="reply-{{ reply.pk }}" class="reply-item d-flex justify-content-between align-items-start mb-2">
                         <div style="min-width: 0;">
                             <a href="{% url 'user-detail' reply.user.pk %}" class="text-decoration-none color-inherit">
                                 <span class="fw-bold me-1 small">{{ reply.user.username }}</span></a><span class="text-muted ms-1" style="font-size: 0.90rem;">{{reply.created_at|date:"d.m"}}</span>
@@ -110,7 +111,7 @@
                         {% endif %}
                     </div>
                 {% empty %}
-                    <p class="small text-muted text-center py-2">Ще немає коментарів...</p>
+                    <p class="empty-replies-msg small text-muted text-center py-2">Ще немає коментарів...</p>
                 {% endfor %}
             </div>
             {% if user.is_authenticated %}
