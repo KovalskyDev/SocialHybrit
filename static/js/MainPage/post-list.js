@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const sentinel = document.getElementById('loading-sentinel');
     const container = document.getElementById('post-container');
     const loader = document.getElementById('loader');
+    const endOfFeed = document.getElementById('end-of-feed');
 
     // --- РЕАЛТАЙМ ОБНОВЛЕНИЯ (HEARTBEAT) ---
     async function startSocialHeartbeat() {
@@ -182,15 +183,32 @@ document.addEventListener("DOMContentLoaded", function() {
         try {
             const response = await fetch(`?page=${page}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const data = await response.json();
+            
             if (!data.html || data.html.trim() === "") {
-                emptyPage = true;
+                stopScrolling(); // Вызываем остановку
             } else {
                 container.insertAdjacentHTML('beforeend', data.html);
-                if (!data.has_next) emptyPage = true;
-                else setTimeout(() => { blockRequest = false; }, 100);
+                if (!data.has_next) {
+                    stopScrolling(); // Вызываем остановку
+                } else {
+                    setTimeout(() => { blockRequest = false; }, 100);
+                }
             }
         } catch (e) { blockRequest = false; } finally {
             if (loader) loader.classList.add('d-none');
+        }
+    }
+
+    function stopScrolling() {
+        emptyPage = true;
+        if (sentinel) {
+            observer.unobserve(sentinel); // Отключаем слежку, экономим ресурсы браузера
+            sentinel.remove(); // Вообще удаляем зону загрузки
+        }
+        if (endOfFeed) {
+            endOfFeed.classList.remove('d-none');
+            // Небольшая задержка для плавного появления
+            setTimeout(() => { endOfFeed.style.opacity = '1'; }, 2500);
         }
     }
 
@@ -220,26 +238,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 const emptyMsg = replyList.querySelector('.empty-replies-msg');
                 if (emptyMsg) emptyMsg.remove();
 
-                const newReplyHtml = `
-                    <div class="reply-item d-flex justify-content-between align-items-start mb-2" id="reply-${data.pk}" style="opacity: 0; transform: translateX(-10px); transition: all 0.3s ease;">
-                        <div style="min-width: 0;">
-                            <a href="/users/${data.user_id}/" class="text-decoration-none color-inherit">
-                                <span class="fw-bold me-1 small">${data.username}</span>
-                            </a>
-                            <span class="text-muted ms-1" style="font-size: 0.85rem;">щойно</span>
-                            <span class="small reply-text d-block">${data.text}</span>
-                        </div>
-                        <a href="/replies/${data.pk}/delete/" class="delete-reply-btn text-muted ms-2 no-select">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>`;
-                
-                replyList.insertAdjacentHTML('beforeend', newReplyHtml);
+
+                replyList.insertAdjacentHTML('beforeend', data.html);
+
+                // Анимация (находим последний добавленный элемент)
+                const newEl = replyList.lastElementChild;
                 setTimeout(() => {
-                    const el = replyList.lastElementChild;
-                    el.style.opacity = '1';
-                    el.style.transform = 'translateX(0)';
-                }, 10);
+                    newEl.style.opacity = '1';
+                    newEl.style.transform = 'translateX(0)';
+                }, 3);
 
                 form.reset();
                 textarea.style.height = 'auto';

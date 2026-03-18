@@ -23,6 +23,13 @@
         <div id="loading-sentinel" class="text-center my-4" style="height: 50px;">
             <div class="spinner-border spinner-border-sm text-primary d-none" id="loader"></div>
         </div>
+
+        <div id="end-of-feed" class="text-center my-5 text-muted d-none" style="opacity: 0; transition: opacity 0.5s ease;">
+            <hr class="w-50 mx-auto opacity-25 mb-3">
+            <i class="bi bi-check2-circle fs-1 text-secondary mb-2 opacity-50 d-block"></i>
+            <p class="fw-bold mb-0">Це всі пости на сьогодні.</p>
+            <a href="{% url 'post-list' %}" style="text-decoration: none;"><span class="small opacity-75">Оновити Ленту</span></a>     
+        </div>
     </div>
 </div>
 {% endblock content %}

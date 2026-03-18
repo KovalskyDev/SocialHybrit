@@ -15,8 +15,10 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 
 from django.views.decorators.http import require_POST
+
 from django.db.models import Case, When, Value, IntegerField
 from django.db.models import Count
+from django.db.models import Prefetch
 
 from django.core.exceptions import PermissionDenied
 
@@ -267,11 +269,18 @@ def add_reply(request, pk):
         reply.user = request.user
         reply.save()
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string(
+                'posts/includes/replies_ajax.html',
+                {
+                    'replies': [reply],
+                    'user': request.user,
+                    'post': post
+                },
+                request=request
+            )
             return JsonResponse({
                 'status': 'success',
-                'text': reply.text,
-                'username': reply.user.username,
-                'user_id': reply.user.pk,
+                'html': html,
                 'pk': reply.pk,
             })
 
@@ -313,34 +322,41 @@ def get_social_updates(request):
     data = {
         'stats': {},
         'new_replies': {},
-        'new_posts_count': 0
+        'new_posts_count': 0, 
     }
 
     if not post_ids or not last_check:
         return JsonResponse(data)
 
+    replies_filter = models.Reply.objects.filter(created_at__gt=last_check).select_related('user')
+    
+    # Если юзер авторизован, исключаем его комменты (чтобы он не получал уведомление о своем же комменте)
+    if request.user.is_authenticated:
+        replies_filter = replies_filter.exclude(user=request.user)
+
     posts = models.Post.objects.filter(id__in=post_ids).annotate(
         l_count=Count('likes', distinct=True),
         r_count=Count('replies', distinct=True)
-    ).prefetch_related('replies')
+    ).prefetch_related(
+    Prefetch('replies', queryset=models.Reply.objects.all(), to_attr='all_replies_cached'),
+    Prefetch('replies', queryset=replies_filter, to_attr='new_only')
+    )
 
     for post in posts:
-        # 1. статы и список ID комментов для каждого поста отдельно
+        # Теперь все данные уже в памяти!
         data['stats'][post.id] = {
             'likes': post.l_count, 
             'replies': post.r_count,
-            'active_replies': list(post.replies.values_list('id', flat=True))
+            # Используем list comprehension, чтобы не лезть в базу
+            'active_replies': [r.id for r in post.all_replies_cached],
+            'created_at': post.created_at.strftime('%d.%m')
         }
         
-        # 2. Новые комменты
-        replies_query = post.replies.filter(created_at__gt=last_check)
-        if request.user.is_authenticated:
-            replies_query = replies_query.exclude(user=request.user)
-
-        if replies_query.exists():
+        # Если в памяти есть новые комменты — рендерим
+        if post.new_only:
             data['new_replies'][post.id] = render_to_string(
                 'posts/includes/replies_ajax.html',
-                {'replies': replies_query, 'user': request.user},
+                {'replies': post.new_only, 'user': request.user, 'post': post},
                 request=request
             )
             
