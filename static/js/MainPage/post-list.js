@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (list && stat.active_replies) {
                             const currentItems = list.querySelectorAll('.reply-item');
                             currentItems.forEach(reply => {
-                                if (!reply.id) return; // ЗАЩИТА ОТ "ДЫР"
+                                if (!reply.id) return;
                                 const rId = parseInt(reply.id.replace('reply-', '')); 
                                 if (!isNaN(rId) && !stat.active_replies.includes(rId)) {
                                     reply.remove();
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             } catch (e) { console.error("Heartbeat error:", e); }
-        }, 3000); // Вернула твои 3 секунды
+        }, 3000);
     }
 
     startSocialHeartbeat();
@@ -270,8 +270,16 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
             if (!confirm('Видалити цей коментар?')) return;
             const replyItem = deleteBtn.closest('.reply-item');
+            const csrfToken = getCookie('csrftoken');
+            
             try {
-                const response = await fetch(deleteBtn.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const response = await fetch(deleteBtn.href, { 
+                    method: "POST",
+                    headers: { 
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken 
+                    }
+                });
                 if (response.ok) {
                     replyItem.style.opacity = '0';
                     replyItem.style.transform = 'translateX(30px)';

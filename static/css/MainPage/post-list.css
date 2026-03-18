@@ -243,6 +243,34 @@ body {
     color: var(--post-text-muted);
     opacity: 0.6;
 }
+/* Класс, который вешается на div поста */
+.light-post {
+    animation: post-fade 3s ease-in-out forwards;
+    border-radius: 0px;
+}
+
+@keyframes post-fade {
+    0% {
+        /* background: 0.07 -> 0.15 */
+        background-color: rgba(13, 110, 253, 0.15); 
+        /* shadow: 0.2 -> 0.4, размытие 15px -> 25px */
+        box-shadow: 0 0 20px rgba(13, 110, 253, 0.4);
+        /* outline: 0.3 -> 0.6 */
+        outline: 2px solid rgba(13, 110, 253, 0.6);
+    }
+    70% {
+        /* Держим яркость чуть дольше, чтобы юзер успел заметить пост */
+        background-color: rgba(13, 110, 253, 0.12);
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+        outline: 2px solid rgba(13, 110, 253, 0.4);
+    }
+    100% {
+        /* Плавный уход в ноль */
+        background-color: transparent;
+        box-shadow: 0 0 0 rgba(13, 110, 253, 0);
+        outline: 2px solid transparent;
+    }
+}
 
 
 /* --- АДАПТИВНОСТЬ --- */

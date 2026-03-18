@@ -40,6 +40,9 @@ def error_404(request, exception):
 def error_405(request, exception):
     return render(request, 'users/auth/405.html', status=405)
 
+"""
+CASTOMUSER AUTH
+"""
 
 @login_required
 def password_change(request):
@@ -54,7 +57,6 @@ def password_change(request):
     else:
         form = PasswordChangeForm(request.user)
     
-    # Используем тот же контекст, что и в редактировании профиля
     return render(request, 'users/auth/password-change.html', {
         'form': form,
         'cmuser_object': request.user
@@ -134,26 +136,32 @@ class ListPostView(ListView):
 
     def get_queryset(self):
         user = self.request.user
-        # Базовый запрос
         queryset = models.Post.objects.all().select_related('creator')
         
+        post_id = self.request.GET.get("post")
+        conditions = []
+
+        # 3. Если в URL есть ID поста, вешаем его на самый верх (Приоритет 0)
+        if post_id and post_id.isdigit():
+            conditions.append(When(pk=int(post_id), then=Value(0)))
+
         if user.is_authenticated:
             following_ids = user.subscriptions.values_list('following_id', flat=True)
             fresh_threshold = timezone.now() - timedelta(days=3)
             now_threshold = timezone.now() - timedelta(seconds=5)
-            
-            queryset = queryset.annotate(
-                priority=Case(
-                    When(creator_id=user.id, created_at__gte=now_threshold, then=Value(1)),
-                    When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(2)),
-                    When(creator_id__in=following_ids, then=Value(3)),
-                    default=Value(4),
-                    output_field=IntegerField(),
-                )
-            ).order_by('priority', '-created_at', '-id')
-        else:
-            queryset = queryset.order_by('-created_at', '-id')
-            
+
+            conditions.append(When(creator_id=user.id, created_at__gte=now_threshold, then=Value(1))) # (Приоритет 1) если только-что созданный пост(5 секунд) - твой
+            conditions.append(When(creator_id__in=following_ids, created_at__gte=fresh_threshold, then=Value(2))) # (Приоритет 2) если твои подписчики что-то запостили И сортировка по самому новому посту
+            conditions.append(When(creator_id__in=following_ids, then=Value(3))) # (Приоритет 3) если твои подписчики что-то запостили
+        
+        queryset = queryset.annotate(
+            priority=Case(
+                *conditions,
+                default=Value(4),
+                output_field=IntegerField(),
+            )
+        ).order_by('priority', '-created_at', '-id')
+
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -194,7 +202,10 @@ class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     form_class = forms.PostForm
     template_name = "posts/post-update.html"
     context_object_name = "post_object"
-    success_url = reverse_lazy('post-list')
+
+    def get_success_url(self):
+        url = reverse("post-list")
+        return f"{url}?post={self.object.pk}"
 
 class DeletePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, DeleteView):
     model = models.Post
@@ -219,10 +230,9 @@ class PostLikeToggle(LoginRequiredMixin, View):
             else:
                 liked = True
 
-        # Отдаем только нужные данные
         return JsonResponse({
             'liked': liked,
-            'likes_count': post.likes_count, # Наш @property из модели
+            'likes_count': post.likes_count,
         })
 
 
@@ -239,7 +249,10 @@ class UserSubscribeToggle(LoginRequiredMixin, View):
             subscription.delete()
 
         return redirect('user-detail', pk=target_user.pk)
-
+    
+"""
+REPLY
+"""
 @login_required
 @require_POST
 def add_reply(request, pk):
@@ -265,12 +278,13 @@ def add_reply(request, pk):
     return _redirect_to_post(request=request, post_id=post.id)
 
 @login_required
+@require_POST
 def delete_reply(request, pk):
     reply = get_object_or_404(models.Reply, pk=pk)
     post_id = reply.post.id
     
     if request.user == reply.user or request.user == reply.post.creator or request.user.is_admin:
-        reply_id = reply.pk  # Сохраняем ID перед удалением
+        reply_id = reply.pk
         reply.delete()
         
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -305,19 +319,17 @@ def get_social_updates(request):
     if not post_ids or not last_check:
         return JsonResponse(data)
 
-    # Предзагружаем комменты сразу для всех постов одним махом (prefetch_related)
-    # Это сэкономит тебе кучу ресурсов CPU
     posts = models.Post.objects.filter(id__in=post_ids).annotate(
         l_count=Count('likes', distinct=True),
         r_count=Count('replies', distinct=True)
     ).prefetch_related('replies')
 
     for post in posts:
-        # 1. Пишем статы И список ID комментов для КАЖДОГО поста отдельно
+        # 1. статы и список ID комментов для каждого поста отдельно
         data['stats'][post.id] = {
             'likes': post.l_count, 
             'replies': post.r_count,
-            'active_replies': list(post.replies.values_list('id', flat=True)) # Теперь внутри!
+            'active_replies': list(post.replies.values_list('id', flat=True))
         }
         
         # 2. Новые комменты

@@ -1,5 +1,5 @@
 {% for post in posts_objects %}
-    <article id="post-{{ post.pk }}" class="card mb-4 post-item border-1 shadow-sm" data-post-id="{{ post.pk }}">
+    <article id="post-{{ post.pk }}" class="card mb-4 post-item border-1 shadow-sm {% if request.GET.post|add:0 == post.pk %}light-post{% endif %}" data-post-id="{{ post.pk }}">
         
         <div class="card-header border-0 py-3 d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">

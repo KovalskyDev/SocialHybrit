@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% block extra_css %} 
 <style>
     /* Контейнер и анимация (общие для ошибок) */
 .error-container {
@@ -22,7 +23,7 @@
     font-size: clamp(0.9rem, 2vw, 1.05rem);
 }
 
-/* Кнопка "На головну" (Черная/Белая инверсия) */
+/* Кнопка "На головну"*/
 .btn-error-primary {
     background-color: var(--bs-emphasis-color) !important;
     color: var(--bs-body-bg) !important;
@@ -70,6 +71,7 @@
     }
 }
 </style>
+{% endblock extra_css %}
 
 {% block title %}Сторінку не знайдено{% endblock %}
 

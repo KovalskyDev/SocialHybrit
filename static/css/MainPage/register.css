@@ -10,7 +10,7 @@
     animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* ТОТ САМЫЙ ГРАДИЕНТ */
+/* ГРАДИЕНТ */
 .login-logo { color: var(--bs-emphasis-color); letter-spacing: -1px; }
 .logo-accent {
     background: var(--hybrid-grad);

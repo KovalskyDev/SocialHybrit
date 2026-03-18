@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
+{% block extra_css %} 
 <style>
-    /* Наследуем твои базовые стили и добавляем щепотку магии для 405 */
     .error-container {
         min-height: 75vh;
         animation: fadeInError 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -29,7 +29,6 @@
         letter-spacing: -0.5px;
     }
 
-    /* Твои кнопки */
     .btn-error-primary {
         background-color: var(--bs-emphasis-color) !important;
         color: var(--bs-body-bg) !important;
@@ -58,6 +57,7 @@
         to { opacity: 1; transform: scale(1); }
     }
 </style>
+{% endblock extra_css %}
 
 {% block title %}Метод не дозволено (405){% endblock %}
 
