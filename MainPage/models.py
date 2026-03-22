@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default=ROLE_USER)
 
+
     class Meta:
         verbose_name = "CustomUser"
         verbose_name_plural = "CustomUsers"
@@ -39,7 +40,6 @@ class CustomUser(AbstractUser):
     def is_admin(self):
         """Проверяет, является ли пользователь администратором через поле role."""
         return self.role == self.ROLE_ADMIN
-    
 
     @property
     def followers_count(self):
@@ -77,6 +77,7 @@ class Post(models.Model):
     media = models.FileField(upload_to="post_media/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, related_name="posts")
+    favorites = models.ManyToManyField(CustomUser, blank=True, related_name="favorite_posts")
 
     def __str__(self):
         return f"{self.name} НАПИСАНО {self.creator}"
@@ -107,6 +108,10 @@ class Post(models.Model):
     @property
     def replies_count(self):
         return self.replies.count()
+    
+    @property
+    def favorites_count(self):
+        return self.favorites.count()
 
     def save(self, *args, **kwargs):
         """Удалит пробелы и переносы в начале и конце"""

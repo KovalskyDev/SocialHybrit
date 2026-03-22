@@ -52,7 +52,42 @@ async function sendLikeRequest(form) {
     }
 }
 
-// 3. Функция переключения видимости комментов
+
+// 3. AJAX функция для избранного
+async function sendFavoriteRequest(form) {
+    if (!form) return;
+
+    const url = form.getAttribute('action');
+    const btn = form.querySelector('.favorite-button');
+
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest', 
+                'X-CSRFToken': getCookie('csrftoken'), 
+            }
+        });
+
+        if (!response.ok) throw new Error('Ошибка сети');
+
+        const data = await response.json(); 
+
+        if (data.favourited) {
+            btn.innerHTML = '<i class="bi bi-bookmark-fill fs-4 fav-icon"></i>';
+        } else {
+            btn.innerHTML = '<i class="bi bi-bookmark fs-4 fav-icon"></i>';
+        }
+    } catch (error) {
+        console.error('Ошибка добавления в избранное:', error);
+    } finally {
+        btn.disabled = false; 
+    }
+}
+
+// 4. Функция переключения видимости комментов
 function toggleComments(postId) {
     const section = document.getElementById('comments-section-' + postId);
     if (!section) return;

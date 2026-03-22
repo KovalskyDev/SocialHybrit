@@ -273,6 +273,34 @@ body {
 }
 
 
+/* Базовые стили для иконки избранного */
+:root {
+    --fav-color: #d4a017; /* Темно-золотой для белого фона */
+}
+
+[data-bs-theme="dark"] {
+    --fav-color: #ffd700; /* Яркое золото для темного фона */
+}
+
+.fav-icon {
+    color: var(--fav-color) !important;
+    transition: all 0.2s ease;
+}
+
+/* Эффект нажатия (уменьшается/увеличивается) */
+.favorite-button:active .fav-icon {
+    transform: scale(1.3);
+}
+.favorite-button {
+    transition: transform 0.1s ease-in-out;
+}
+
+
+/* Анимация пульсации, когда флажок закрашивается (добавляется в избранное) */
+.bi-bookmark-fill.fav-icon {
+    animation: heartBeat 0.3s ease-out; /* Используем ту же анимацию, что у твоего лайка */
+}
+
 /* --- АДАПТИВНОСТЬ --- */
 @media (max-width: 576px) {
     .post-item {
