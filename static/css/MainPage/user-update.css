@@ -126,14 +126,12 @@
         background: transparent !important;
     }
 
-    /* Прячем текст на совсем мелких, оставляем иконки, если нужно, 
-       но тут слов мало, так что влезет. На всякий случай: */
     .nav-text {
         display: inline-block;
     }
 }
 
-/* Стили для десктопа (возвращаем как было) */
+/* Стили для десктопа */
 @media (min-width: 768px) {
     .settings-nav-flex {
         flex-direction: column;
@@ -143,7 +141,7 @@
     }
 }
 
-/* Mobile S (320px) конкретно */
+/* Mobile S (320px) */
 @media (max-width: 320px) {
     .settings-nav-link {
         padding: 8px 5px !important;

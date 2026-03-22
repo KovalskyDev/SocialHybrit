@@ -86,9 +86,7 @@ class Post(models.Model):
         verbose_name_plural = "Posts"
     
     def can_manage(self, user, allow_admin=True):
-        """
-        Проверяет, может ли конкретный юзер управлять этим постом.
-        """
+        """Проверяет, может ли конкретный юзер управлять этим постом."""
         if not user or user.is_anonymous:
             return False
         
@@ -111,8 +109,9 @@ class Post(models.Model):
         return self.replies.count()
 
     def save(self, *args, **kwargs):
+        """Удалит пробелы и переносы в начале и конце"""
         if self.about:
-            self.about = self.about.strip() # Удалит пробелы и переносы в начале и конце
+            self.about = self.about.strip()
         super().save(*args, **kwargs)
 
 class Like(models.Model):

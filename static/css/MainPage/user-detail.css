@@ -82,7 +82,7 @@
     display: block;
     position: relative;
     text-decoration: none;
-    border-radius: 0; /* Строгий плотный стиль */
+    border-radius: 0;
     overflow: hidden;
     aspect-ratio: 3 / 4; /* Вертикальный прямоугольник */
     background: var(--bs-secondary-bg);
@@ -100,7 +100,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: filter 0.3s ease; /* Только яркость, без зума */
+    transition: filter 0.3s ease;
 }
 
 /* --- КРУПНЫЙ ТЕКСТ НА ГРАДИЕНТЕ --- */
@@ -126,7 +126,6 @@
     text-align: center;
     color: white;
     
-    /* Убийца спама */
     word-break: break-word; 
     overflow-wrap: anywhere; 
     
@@ -156,7 +155,7 @@
         opacity: 1;
     }
     .post-grid-item:hover .grid-media {
-        filter: brightness(0.7); /* Просто приглушаем картинку */
+        filter: brightness(0.7);
     }
 }
 
@@ -204,17 +203,11 @@
 /* --- ФИКС ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (Mobile S, M, L) --- */
 @media (max-width: 425px) {
     .post-grid-text {
-        /* 1. Снижаем размер еще немного для мобилок */
         font-size: clamp(0.75rem, 3.5vw, 0.9rem); 
         
-        /* 2. Убираем жирнючий капс, чтобы буквы стали уже */
         text-transform: none; 
-        font-weight: 700; /* Чуть меньше жирности, чтобы не сливалось */
-        
-        /* 3. Сжимаем межбуквенный интервал (буквы прижмутся друг к другу) */
+        font-weight: 700;
         letter-spacing: -0.5px;
-        
-        /* 4. Даем тексту чуть больше места по краям */
         padding: 0 8px;
         
         /* 5. Увеличиваем количество строк, раз шрифт стал меньше */
@@ -222,7 +215,7 @@
     }
 }
 
-/* Совсем экстремальный фикс для Mobile S (320px) */
+/* фикс для Mobile S (320px) */
 @media (max-width: 320px) {
     .post-grid-text {
         font-size: 0.7rem;

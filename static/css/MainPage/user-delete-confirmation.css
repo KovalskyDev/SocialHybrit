@@ -9,7 +9,7 @@
     border-color: var(--bs-border-color-translucent) !important;
     animation: shakeIn 0.5s cubic-bezier(.36,.07,.19,.97) both;
     transition: all 0.3s ease-in-out;
-    width: 100%; /* Чтобы колонки Bootstrap работали правильно */
+    width: 100%;
 }
 
 .delete-title {

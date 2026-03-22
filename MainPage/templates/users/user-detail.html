@@ -82,7 +82,7 @@
 
         <ul class="nav nav-tabs border-0 justify-content-center mb-1 mb-md-2" id="profileTabs">
             <li class="nav-item">
-                <a class="nav-link active border-0 border-top border-2 border-emphasis rounded-0 bg-transparent text-emphasis fw-bold small" href="#">
+                <a class="nav-link active border-0 border-top border-2 border-emphasis rounded-0 bg-transparent text-emphasis fw-bold small" href="{% url 'user-detail' cmuser_object.pk %}">
                     <i class="bi bi-grid-3x3 me-2"></i>ДОПИСИ
                 </a>
             </li>
@@ -92,7 +92,7 @@
             <div class="row g-1 justify-content-start"> 
                 {% for post in cmuser_object.posts.all %}
                     <div class="col-4 col-lg-3">
-                        <a href="{% url 'post-list' %}#post-{{ post.pk }}" class="post-grid-item shadow-sm">
+                        <a href="{% url 'post-list' %}?post={{post.pk}}" class="post-grid-item shadow-sm">
                             <div class="post-grid-content">
                                 {% if post.media %}
                                     {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}

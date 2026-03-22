@@ -7,7 +7,6 @@ class ExceptionHandlerMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
         
-        # Если сервер хочет вернуть 405, мы подменяем его на твой красивый шаблон
         if response.status_code == 405:
             return render(request, 'users/auth/405.html', status=405)
             
