@@ -200,6 +200,25 @@
 }
 
 
+/* --- ТАБЫ (ИНСТА СТАЙЛ) --- */
+.profile-tab-btn {
+    color: var(--bs-secondary-color) !important; 
+    border-top-color: transparent !important; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Когда вкладка активна */
+.nav-tabs .nav-link.active.profile-tab-btn {
+    border-top: 2px solid var(--bs-emphasis-color) !important; 
+    color: var(--bs-emphasis-color) !important; 
+    background: transparent !important;
+}
+
+.profile-tab-btn i {
+    font-size: 1.1em;
+}
+
 /* --- ФИКС ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (Mobile S, M, L) --- */
 @media (max-width: 425px) {
     .post-grid-text {
@@ -210,16 +229,17 @@
         letter-spacing: -0.5px;
         padding: 0 8px;
         
-        /* 5. Увеличиваем количество строк, раз шрифт стал меньше */
-        -webkit-line-clamp: 5; 
+        -webkit-line-clamp: 4; 
     }
 }
 
 /* фикс для Mobile S (320px) */
 @media (max-width: 320px) {
     .post-grid-text {
-        font-size: 0.7rem;
-        line-height: 1;
+        font-size: 0.8rem;
+        line-height: 1.2;
         padding: 0 4px;
+        -webkit-line-clamp: 4;
+        font-weight: 100; 
     }
 }

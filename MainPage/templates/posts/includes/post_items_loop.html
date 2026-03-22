@@ -83,10 +83,19 @@
                         </button>
                         <span class="fw-bold small" id="replies-count-{{ post.pk }}">{{ post.replies.count }}</span>
                     </div>
-
-                    <i class="bi bi-send fs-4 cursor-pointer"></i>
                 </div>
-                <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
+
+                <form action="{% url 'post-favourite' post.pk %}" method="post" class="m-0 ajax-favorite-form" data-post-id="{{ post.pk }}">
+                    {% csrf_token %}
+                    <button type="button" class="btn p-0 border-0 shadow-none d-flex align-items-center bg-transparent color-inherit favorite-button"
+                            onclick="sendFavoriteRequest(this.closest('.ajax-favorite-form'))">
+                        {% if request.user in post.favorites.all %}
+                            <i class="bi bi-bookmark-fill fs-4 fav-icon"></i>
+                        {% else %}
+                            <i class="bi bi-bookmark fs-4 fav-icon"></i>
+                        {% endif %}
+                    </button>
+                </form>
             </div>
             
             <div class="post-text-container px-3 pb-3">

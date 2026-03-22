@@ -103,6 +103,7 @@ class DetailCustomUserView(DetailView):
         is_sub = False
         if self.request.user.is_authenticated:
             is_sub = self.request.user.is_following(self.object)
+            context["favorites"] = self.request.user.favorite_posts.count()
         
         context["is_sub"] = is_sub
         return context
@@ -116,6 +117,21 @@ class UpdateCustomUserView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView
 
     def get_success_url(self):
         return reverse("user-detail", kwargs={"pk": self.object.pk})
+    
+
+class UserSubscribeToggle(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        target_user = get_object_or_404(models.CustomUser, pk=pk)
+
+        if request.user == target_user:
+            return redirect('user-detail', pk=target_user.pk)
+
+        subscription, created = models.Subscription.objects.get_or_create(following=target_user, follower=request.user)
+
+        if not created:
+            subscription.delete()
+
+        return redirect('user-detail', pk=target_user.pk)
     
 """
 POST CBV
@@ -198,7 +214,19 @@ class ListPostView(ListView):
             })
 
         return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
+        if self.request.user.is_authenticated:
+            context['user_liked_posts_ids'] = models.Like.objects.filter(
+                user=self.request.user,
+                post__in=context['posts_objects'] # Только для постов на текущей странице
+            ).values_list('post_id', flat=True)
+        else:
+            context['user_liked_posts_ids'] = []
+            
+        return context
 class UpdatePostView(LoginRequiredMixin, SmartUserIsOwnerMixin, UpdateView):
     model = models.Post
     form_class = forms.PostForm
@@ -237,21 +265,22 @@ class PostLikeToggle(LoginRequiredMixin, View):
             'likes_count': post.likes_count,
         })
 
-
-class UserSubscribeToggle(LoginRequiredMixin, View):
+class PostFavoriteToggle(LoginRequiredMixin, View):
     def post(self, request, pk):
-        target_user = get_object_or_404(models.CustomUser, pk=pk)
+        post = get_object_or_404(models.Post, pk=pk)
 
-        if request.user == target_user:
-            return redirect('user-detail', pk=target_user.pk)
+        if post.favorites.filter(id=request.user.id).exists():
+            post.favorites.remove(request.user)
+            favourited = False
+        else:
+            post.favorites.add(request.user)
+            favourited = True
+        
+        return JsonResponse({
+            'favourited': favourited
+        })
 
-        subscription, created = models.Subscription.objects.get_or_create(following=target_user, follower=request.user)
 
-        if not created:
-            subscription.delete()
-
-        return redirect('user-detail', pk=target_user.pk)
-    
 """
 REPLY
 """
