@@ -81,7 +81,7 @@ class CustomUser(AbstractUser):
     
 class Post(models.Model):
     name = models.CharField(max_length=100)
-    about = models.TextField(max_length=2200)
+    about = models.TextField(max_length=2200, null=True, blank=True)
     media = models.FileField(upload_to="post_media/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, related_name="posts")
