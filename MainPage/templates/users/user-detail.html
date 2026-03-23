@@ -52,9 +52,15 @@
                 </div>
 
                 <div class="d-flex mb-2 mb-md-3 gap-3 gap-md-4 stats-row">
-                    <div class="stat-item"><strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small">дописів</span></div>
-                    <div class="stat-item"><strong>{{ cmuser_object.followers_count }}</strong> <span class="text-muted small">читачів</span></div>
-                    <div class="stat-item"><strong>{{ cmuser_object.following_count }}</strong> <span class="text-muted small">відстежуваних</span></div>
+                    <div class="stat-item">
+                        <strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small">дописів</span>
+                    </div>
+                    <div class="stat-item" data-bs-toggle="modal" data-bs-target="#followersModal" style="cursor: pointer;">
+                        <strong>{{ cmuser_object.followers_count }}</strong> <span class="text-muted small">читачів</span>
+                    </div>
+                    <div class="stat-item" data-bs-toggle="modal" data-bs-target="#followingModal" style="cursor: pointer;">
+                        <strong>{{ cmuser_object.following_count }}</strong> <span class="text-muted small">відстежуваних</span>
+                    </div>
                 </div>
 
                 <div class="small d-none d-sm-block profile-bio">
@@ -181,6 +187,96 @@
             </div>
             {% endif %}
             
-        </div> </div>
+        </div>
+    </div>
 </div>
+
+<div class="modal fade custom-modal-blur" id="followersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg bg-glass">
+            <div class="modal-header border-bottom-0 justify-content-center py-2 position-relative">
+                <h6 class="modal-title fw-bold">Читачі</h6>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="user-list">
+                    {% for sub in cmuser_object.subscribers.all %}
+                        {% with person=sub.follower %}
+                        <div class="user-item d-flex align-items-center justify-content-between p-3">
+                            <a href="{% url 'user-detail' person.pk %}" class="text-decoration-none d-flex align-items-center gap-2">
+                                <div class="mini-avatar">
+                                    {% if person.avatar %}<img src="{{ person.avatar.url }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                    {% else %}<div class="rounded-circle w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white small">{{ person.username|slice:":1"|upper }}</div>{% endif %}
+                                </div>
+                                <span class="fw-bold text-emphasis small">{{ person.username }}</span>
+                            </a>
+                            
+                            {% if user.is_authenticated and user != person %}
+                                <form action="{% url 'user-sub' person.pk %}" method="post" class="m-0">
+                                    {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+                                    
+                                    {% if person.id in user.get_following_ids %}
+                                        <button type="submit" class="btn btn-following-custom">Відстежується</button>
+                                    {% elif person.id in user.get_follower_ids %}
+                                        <button type="submit" class="btn btn-follow-back-custom">Стежити у відповідь</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-follow-custom">Стежити</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    {% empty %}
+                        <p class="text-center text-muted py-4 small mb-0">Ще немає читачів</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal-blur" id="followingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg bg-glass">
+            <div class="modal-header border-bottom-0 justify-content-center py-2 position-relative">
+                <h6 class="modal-title fw-bold">Відстежувані</h6>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="user-list">
+                    {% for sub in cmuser_object.subscriptions.all %}
+                        {% with person=sub.following %}
+                        <div class="user-item d-flex align-items-center justify-content-between p-3">
+                            <a href="{% url 'user-detail' person.pk %}" class="text-decoration-none d-flex align-items-center gap-2">
+                                <div class="mini-avatar">
+                                    {% if person.avatar %}<img src="{{ person.avatar.url }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                    {% else %}<div class="rounded-circle w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white small">{{ person.username|slice:":1"|upper }}</div>{% endif %}
+                                </div>
+                                <span class="fw-bold text-emphasis small">{{ person.username }}</span>
+                            </a>
+                            
+                            {% if user.is_authenticated and user != person %}
+                                <form action="{% url 'user-sub' person.pk %}" method="post" class="m-0">
+                                    {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+                                    
+                                    {% if person.id in user.get_following_ids %}
+                                        <button type="submit" class="btn btn-following-custom">Відстежується</button>
+                                    {% elif person.id in user.get_follower_ids %}
+                                        <button type="submit" class="btn btn-follow-back-custom">Стежити у відповідь</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-follow-custom">Стежити</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    {% empty %}
+                        <p class="text-center text-muted py-4 small mb-0">Список порожній</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}

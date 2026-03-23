@@ -55,6 +55,14 @@ class CustomUser(AbstractUser):
         """Проверяет, подписан ли текущий юзер на указанного пользователя."""
         return self.subscriptions.filter(following=user).exists()
     
+    def get_following_ids(self):
+        """Возвращает список ID людей, на которых подписан этот юзер"""
+        return list(self.subscriptions.values_list('following_id', flat=True))
+
+    def get_follower_ids(self):
+        """Возвращает список ID людей, которые подписаны на этого юзера"""
+        return list(self.subscribers.values_list('follower_id', flat=True))
+    
 
     def can_manage(self, user, allow_admin=True):
         """
@@ -170,4 +178,3 @@ class Subscription(models.Model):
         from django.core.exceptions import ValidationError
         if self.follower == self.following:
             raise ValidationError("Нельзя подписаться на самого себя!")
-    
