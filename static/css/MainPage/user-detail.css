@@ -27,7 +27,7 @@
 
 /* --- ТЕКСТ И ИМЯ --- */
 .user-title {
-    letter-spacing: -1px;
+    letter-spacing: 0px;
     font-size: clamp(1.2rem, 4vw, 2rem);
     color: var(--bs-emphasis-color);
 }
@@ -82,7 +82,7 @@
     display: block;
     position: relative;
     text-decoration: none;
-    border-radius: 0; /* Строгий плотный стиль */
+    border-radius: 0;
     overflow: hidden;
     aspect-ratio: 3 / 4; /* Вертикальный прямоугольник */
     background: var(--bs-secondary-bg);
@@ -100,7 +100,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: filter 0.3s ease; /* Только яркость, без зума */
+    transition: filter 0.3s ease;
 }
 
 /* --- КРУПНЫЙ ТЕКСТ НА ГРАДИЕНТЕ --- */
@@ -126,7 +126,6 @@
     text-align: center;
     color: white;
     
-    /* Убийца спама */
     word-break: break-word; 
     overflow-wrap: anywhere; 
     
@@ -156,7 +155,7 @@
         opacity: 1;
     }
     .post-grid-item:hover .grid-media {
-        filter: brightness(0.7); /* Просто приглушаем картинку */
+        filter: brightness(0.7);
     }
 }
 
@@ -201,32 +200,184 @@
 }
 
 
-/* --- ФИКС ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (Mobile S, M, L) --- */
-@media (max-width: 425px) {
-    .post-grid-text {
-        /* 1. Снижаем размер еще немного для мобилок */
-        font-size: clamp(0.75rem, 3.5vw, 0.9rem); 
-        
-        /* 2. Убираем жирнючий капс, чтобы буквы стали уже */
-        text-transform: none; 
-        font-weight: 700; /* Чуть меньше жирности, чтобы не сливалось */
-        
-        /* 3. Сжимаем межбуквенный интервал (буквы прижмутся друг к другу) */
-        letter-spacing: -0.5px;
-        
-        /* 4. Даем тексту чуть больше места по краям */
-        padding: 0 8px;
-        
-        /* 5. Увеличиваем количество строк, раз шрифт стал меньше */
-        -webkit-line-clamp: 5; 
+/* --- ТАБЫ (ИНСТА СТАЙЛ) --- */
+.profile-tab-btn {
+    color: var(--bs-secondary-color) !important; 
+    border-top-color: transparent !important; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Когда вкладка активна */
+.nav-tabs .nav-link.active.profile-tab-btn {
+    border-top: 2px solid var(--bs-emphasis-color) !important; 
+    color: var(--bs-emphasis-color) !important; 
+    background: transparent !important;
+}
+
+.profile-tab-btn i {
+    font-size: 1.1em;
+}
+
+
+/* АДАПТИВНЫЕ ГЛАСС-МОДАЛКИ*/
+
+/* 1. ОСНОВНОЙ КОНТЕЙНЕР (Адаптивный фон и блюр) */
+.custom-modal-blur .modal-content {
+    background: rgba(var(--bs-body-bg-rgb), 0.8) !important;
+    backdrop-filter: blur(15px) saturate(160%);
+    -webkit-backdrop-filter: blur(15px) saturate(160%);
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.15) !important;
+    border-radius: 18px;
+    color: var(--bs-body-color);
+}
+
+.custom-modal-blur .modal-header {
+    border-bottom: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.05);
+    padding: 1rem;
+}
+
+.custom-modal-blur .modal-title {
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+/* 2. СПИСОК ПОЛЬЗОВАТЕЛЕЙ */
+.user-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.05) !important;
+    transition: background 0.2s ease;
+}
+
+.user-item:last-child {
+    border-bottom: none !important;
+}
+
+.user-item:hover {
+    background: rgba(var(--bs-emphasis-color-rgb), 0.03);
+}
+
+.user-item a {
+    color: var(--bs-emphasis-color) !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* 3. АВАТАРКИ */
+.mini-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.1);
+    overflow: hidden;
+}
+
+/* 4. КНОПКИ (ЛОГИКА СОСТОЯНИЙ) */
+
+/* СТЕЖИТИ (Акцентная: инверсия темы) */
+.btn-follow-custom {
+    background: var(--bs-emphasis-color);
+    color: var(--bs-body-bg);
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 10px;
+    transition: opacity 0.2s;
+}
+
+/* СТЕЖИТИ У ВІДПОВІДЬ (Мягкая: светлая/серая плашка) */
+.btn-follow-back-custom {
+    background: rgba(var(--bs-emphasis-color-rgb), 0.07); 
+    color: var(--bs-emphasis-color);
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.1);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.btn-follow-back-custom:hover {
+    background: rgba(var(--bs-emphasis-color-rgb), 0.12);
+    color: var(--bs-emphasis-color);
+}
+
+/* ВІДСТЕЖУЄТЬСЯ (Контурная) */
+.btn-following-custom {
+    background: transparent;
+    color: var(--bs-emphasis-color);
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.2);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 10px;
+    transition: opacity 0.2s;
+}
+
+.btn-follow-custom:hover, .btn-following-custom:hover {
+    opacity: 0.8;
+}
+
+/* 5. СКРОЛЛБАР */
+.modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(var(--bs-emphasis-color-rgb), 0.2);
+    border-radius: 10px;
+}
+
+/* 6. АДАПТИВНОСТЬ (Размеры и смещение вверх) */
+
+@media (min-width: 768px) {
+    .custom-modal-blur .modal-dialog {
+        max-width: 500px;
+        margin-top: 5vh;
+    }
+    .custom-modal-blur .modal-dialog-centered {
+        display: block;
+        min-height: auto;
     }
 }
 
-/* Совсем экстремальный фикс для Mobile S (320px) */
+@media (min-width: 1024px) {
+    .custom-modal-blur .modal-dialog {
+        max-width: 550px;
+        margin-top: 8vh;
+    }
+}
+
+@media (min-width: 1440px) {
+    .custom-modal-blur .modal-dialog {
+        max-width: 600px;
+        margin-top: 10vh;
+    }
+}
+
+
+/* --- ФИКС ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (Mobile S, M, L) --- */
+@media (max-width: 425px) {
+    .post-grid-text {
+        font-size: clamp(0.75rem, 3.5vw, 0.9rem); 
+        
+        text-transform: none; 
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        padding: 0 8px;
+        
+        -webkit-line-clamp: 4; 
+    }
+}
+
+/* фикс для Mobile S (320px) */
 @media (max-width: 320px) {
     .post-grid-text {
-        font-size: 0.7rem;
-        line-height: 1;
+        font-size: 0.8rem;
+        line-height: 1.2;
         padding: 0 4px;
+        -webkit-line-clamp: 4;
+        font-weight: 100; 
     }
 }

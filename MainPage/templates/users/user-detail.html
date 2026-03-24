@@ -34,17 +34,33 @@
                                 <a href="{% url 'user-update' cmuser_object.pk %}" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-3">Редагувати</a>
                                 <a href="{% url 'user-delete' cmuser_object.pk %}" class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="bi bi-trash"></i></a>
                             {% else %}
-                                <button class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">Стежити</button>
-                                <button class="btn btn-sm btn-secondary-custom rounded-pill fw-bold px-3">Повідомлення</button>
+                                <form action="{% url 'user-sub' cmuser_object.pk %}" method="post" class="m-0 like-form">
+                                    {% csrf_token %}
+                                    {% if is_sub %} 
+                                        <button type="submit" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">
+                                            Перестати стежити
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-sm btn-edit-profile rounded-pill fw-bold px-4">
+                                            Стежити
+                                        </button>
+                                    {% endif %}
+                                </form> 
                             {% endif %}
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="d-flex mb-2 mb-md-3 gap-3 gap-md-4 stats-row">
-                    <div class="stat-item"><strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small">дописів</span></div>
-                    <div class="stat-item"><strong>0</strong> <span class="text-muted small">читачів</span></div>
-                    <div class="stat-item"><strong>0</strong> <span class="text-muted small">відстежуваних</span></div>
+                    <div class="stat-item">
+                        <strong>{{ cmuser_object.posts.count }}</strong> <span class="text-muted small">дописів</span>
+                    </div>
+                    <div class="stat-item" data-bs-toggle="modal" data-bs-target="#followersModal" style="cursor: pointer;">
+                        <strong>{{ cmuser_object.followers_count }}</strong> <span class="text-muted small">читачів</span>
+                    </div>
+                    <div class="stat-item" data-bs-toggle="modal" data-bs-target="#followingModal" style="cursor: pointer;">
+                        <strong>{{ cmuser_object.following_count }}</strong> <span class="text-muted small">відстежуваних</span>
+                    </div>
                 </div>
 
                 <div class="small d-none d-sm-block profile-bio">
@@ -69,52 +85,198 @@
             </div>
         </div>
 
-        <ul class="nav nav-tabs border-0 justify-content-center mb-1 mb-md-2" id="profileTabs">
-            <li class="nav-item">
-                <a class="nav-link active border-0 border-top border-2 border-emphasis rounded-0 bg-transparent text-emphasis fw-bold small" href="#">
+        <ul class="nav nav-tabs border-0 justify-content-center mb-1 mb-md-2" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active border-0 border-top border-2 border-transparent rounded-0 bg-transparent text-muted fw-bold small profile-tab-btn" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-tab-pane" type="button" role="tab" aria-controls="posts-tab-pane" aria-selected="true">
                     <i class="bi bi-grid-3x3 me-2"></i>ДОПИСИ
-                </a>
+                </button>
             </li>
+            
+            {% if user == cmuser_object %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link border-0 border-top border-2 border-transparent rounded-0 bg-transparent text-muted fw-bold small profile-tab-btn" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved-tab-pane" type="button" role="tab" aria-controls="saved-tab-pane" aria-selected="false">
+                    <i class="bi bi-bookmark me-2"></i>ЗБЕРЕЖЕНЕ
+                </button>
+            </li>
+            {% endif %}
         </ul>
 
-        <div class="profile-posts-grid-wrapper mb-5">
-            <div class="row g-1 justify-content-start"> 
-                {% for post in cmuser_object.posts.all %}
-                    <div class="col-4 col-lg-3">
-                        <a href="{% url 'post-list' %}#post-{{ post.pk }}" class="post-grid-item shadow-sm">
-                            <div class="post-grid-content">
-                                {% if post.media %}
-                                    {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
-                                        <div class="video-icon-badge"><i class="bi bi-play-fill"></i></div>
-                                        <video src="{{ post.media.url }}" class="grid-media"></video>
-                                    {% else %}
-                                        <img src="{{ post.media.url }}" class="grid-media" loading="lazy">
-                                    {% endif %}
-                                {% else %}
-                                    <div class="grid-media d-flex align-items-center justify-content-center p-2 p-md-3 text-center bg-custom-gradient">
-                                        <div class="post-grid-text-wrapper">
-                                            <span class="post-grid-text fw-bold text-white">{{ post.name }}</span>
+        <div class="tab-content" id="profileTabsContent">
+            
+            <div class="tab-pane fade show active" id="posts-tab-pane" role="tabpanel" aria-labelledby="posts-tab" tabindex="0">
+                <div class="profile-posts-grid-wrapper mb-5">
+                    <div class="row g-1 justify-content-start"> 
+                        {% for post in cmuser_object.posts.all %}
+                            <div class="col-4 col-lg-3">
+                                <a href="{% url 'post-list' %}?post={{post.pk}}" class="post-grid-item shadow-sm">
+                                    <div class="post-grid-content">
+                                        {% if post.media %}
+                                            {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
+                                                <div class="video-icon-badge"><i class="bi bi-play-fill"></i></div>
+                                                <video src="{{ post.media.url }}" class="grid-media"></video>
+                                            {% else %}
+                                                <img src="{{ post.media.url }}" class="grid-media" loading="lazy">
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="grid-media d-flex align-items-center justify-content-center p-2 p-md-3 text-center bg-custom-gradient">
+                                                <div class="post-grid-text-wrapper">
+                                                    <span class="post-grid-text fw-bold text-white">{{ post.name }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="post-grid-overlay">
+                                            <div class="d-flex gap-2 gap-md-3">
+                                                <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
+                                                <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                {% endif %}
-                                
-                                <div class="post-grid-overlay">
-                                    <div class="d-flex gap-2 gap-md-3">
-                                        <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
-                                        <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
-                                    </div>
-                                </div>
+                                </a>
                             </div>
-                        </a>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <i class="bi bi-camera text-secondary display-1 opacity-25"></i>
+                                <p class="text-secondary mt-3">Ще немає публікацій</p>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% empty %}
-                    <div class="col-12 text-center py-5">
-                        <i class="bi bi-camera text-secondary display-1 opacity-25"></i>
-                        <p class="text-secondary mt-3">Ще немає публікацій</p>
+                </div>
+            </div>
+
+            {% if user == cmuser_object %}
+            <div class="tab-pane fade" id="saved-tab-pane" role="tabpanel" aria-labelledby="saved-tab" tabindex="0">
+                <div class="profile-posts-grid-wrapper mb-5">
+                    <div class="row g-1 justify-content-start"> 
+                        {% for post in cmuser_object.favorite_posts.all %}
+                            <div class="col-4 col-lg-3">
+                                <a href="{% url 'post-list' %}?post={{post.pk}}" class="post-grid-item shadow-sm">
+                                    <div class="post-grid-content">
+                                        {% if post.media %}
+                                            {% if post.media.url|lower|slice:"-4:" == ".mp4" or post.media.url|lower|slice:"-4:" == ".mov" %}
+                                                <div class="video-icon-badge"><i class="bi bi-play-fill"></i></div>
+                                                <video src="{{ post.media.url }}" class="grid-media"></video>
+                                            {% else %}
+                                                <img src="{{ post.media.url }}" class="grid-media" loading="lazy">
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="grid-media d-flex align-items-center justify-content-center p-2 p-md-3 text-center bg-custom-gradient">
+                                                <div class="post-grid-text-wrapper">
+                                                    <span class="post-grid-text fw-bold text-white">{{ post.name }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="post-grid-overlay">
+                                            <div class="d-flex gap-2 gap-md-3">
+                                                <span class="text-white fw-bold small"><i class="bi bi-heart-fill"></i> {{ post.likes_count }}</span>
+                                                <span class="text-white fw-bold small"><i class="bi bi-chat-fill"></i> {{ post.replies_count }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <i class="bi bi-bookmark text-secondary display-1 opacity-25"></i>
+                                <p class="text-secondary mt-3">Тут з'являтимуться збережені дописи</p>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal-blur" id="followersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg bg-glass">
+            <div class="modal-header border-bottom-0 justify-content-center py-2 position-relative">
+                <h6 class="modal-title fw-bold">Читачі</h6>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="user-list">
+                    {% for sub in cmuser_object.subscribers.all %}
+                        {% with person=sub.follower %}
+                        <div class="user-item d-flex align-items-center justify-content-between p-3">
+                            <a href="{% url 'user-detail' person.pk %}" class="text-decoration-none d-flex align-items-center gap-2">
+                                <div class="mini-avatar">
+                                    {% if person.avatar %}<img src="{{ person.avatar.url }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                    {% else %}<div class="rounded-circle w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white small">{{ person.username|slice:":1"|upper }}</div>{% endif %}
+                                </div>
+                                <span class="fw-bold text-emphasis small">{{ person.username }}</span>
+                            </a>
+                            
+                            {% if user.is_authenticated and user != person %}
+                                <form action="{% url 'user-sub' person.pk %}" method="post" class="m-0">
+                                    {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+                                    
+                                    {% if person.id in user.get_following_ids %}
+                                        <button type="submit" class="btn btn-following-custom">Відстежується</button>
+                                    {% elif person.id in user.get_follower_ids %}
+                                        <button type="submit" class="btn btn-follow-back-custom">Стежити у відповідь</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-follow-custom">Стежити</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    {% empty %}
+                        <p class="text-center text-muted py-4 small mb-0">Ще немає читачів</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade custom-modal-blur" id="followingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg bg-glass">
+            <div class="modal-header border-bottom-0 justify-content-center py-2 position-relative">
+                <h6 class="modal-title fw-bold">Відстежувані</h6>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="user-list">
+                    {% for sub in cmuser_object.subscriptions.all %}
+                        {% with person=sub.following %}
+                        <div class="user-item d-flex align-items-center justify-content-between p-3">
+                            <a href="{% url 'user-detail' person.pk %}" class="text-decoration-none d-flex align-items-center gap-2">
+                                <div class="mini-avatar">
+                                    {% if person.avatar %}<img src="{{ person.avatar.url }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                    {% else %}<div class="rounded-circle w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white small">{{ person.username|slice:":1"|upper }}</div>{% endif %}
+                                </div>
+                                <span class="fw-bold text-emphasis small">{{ person.username }}</span>
+                            </a>
+                            
+                            {% if user.is_authenticated and user != person %}
+                                <form action="{% url 'user-sub' person.pk %}" method="post" class="m-0">
+                                    {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+                                    
+                                    {% if person.id in user.get_following_ids %}
+                                        <button type="submit" class="btn btn-following-custom">Відстежується</button>
+                                    {% elif person.id in user.get_follower_ids %}
+                                        <button type="submit" class="btn btn-follow-back-custom">Стежити у відповідь</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-follow-custom">Стежити</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    {% empty %}
+                        <p class="text-center text-muted py-4 small mb-0">Список порожній</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}

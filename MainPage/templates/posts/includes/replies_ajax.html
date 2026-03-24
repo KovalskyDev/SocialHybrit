@@ -1,0 +1,14 @@
+{% for reply in replies %}
+    <div id="reply-{{ reply.pk }}" class="reply-item d-flex justify-content-between align-items-start mb-2" style="opacity: 0; transform: translateX(-10px); transition: all 0.3s ease;">
+        <div style="min-width: 0;">
+            <a href="{% url 'user-detail' reply.user.pk %}" class="text-decoration-none color-inherit">
+                <span class="fw-bold me-1 small">{{ reply.user.username }}</span></a><span class="text-muted ms-1" style="font-size: 0.90rem;">{{reply.created_at|date:"d.m"}}</span>
+            <span class="small reply-text d-block">{{ reply.text }}</span>
+        </div>
+        {% if reply.user == user or post.creator == user or user.is_admin %}
+            <a href="{% url 'delete_reply' reply.pk %}" class="delete-reply-btn text-muted ms-2 no-select">
+                <i class="bi bi-trash"></i>
+            </a>
+        {% endif %}
+    </div>
+{% endfor %}

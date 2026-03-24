@@ -23,7 +23,6 @@ class CustomUserUpdateForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Добавляем атрибуты прямо в виджет поля
         if 'age' in self.fields:
             self.fields['age'].widget.attrs.update({
                 'min': '13',

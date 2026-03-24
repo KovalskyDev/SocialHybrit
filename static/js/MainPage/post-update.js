@@ -80,7 +80,7 @@ mediaInput.onchange = function() {
     }
 };
 
-// 5. Логика моментального удаления (Instagram Style)
+// 5. Логика моментального удаления
 if (deleteBtn) {
     deleteBtn.onclick = function() {
         // Визуально скрываем всё

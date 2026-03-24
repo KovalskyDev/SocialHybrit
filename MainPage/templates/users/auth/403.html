@@ -1,5 +1,80 @@
 {% extends "base.html" %}
 
+{% block extra_css %} 
+<style>
+        /* Контейнер ошибки */
+    .error-container {
+        min-height: 70vh;
+        animation: fadeInError 0.4s ease-out forwards;
+    }
+
+    /* Иконка */
+    .error-icon {
+        font-size: clamp(4rem, 10vw, 6.5rem);
+        color: var(--bs-secondary-color);
+        opacity: 0.25;
+    }
+
+    /* Заголовок и текст */
+    .error-title {
+        color: var(--bs-emphasis-color);
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+    }
+
+    .error-text {
+        font-size: clamp(0.9rem, 2vw, 1.05rem);
+    }
+
+    /* Кнопка "На главную" */
+    .btn-error-primary {
+        background-color: var(--bs-emphasis-color) !important;
+        color: var(--bs-body-bg) !important;
+        border: none !important;
+        padding: 10px 25px;
+        transition: opacity 0.2s ease, transform 0.1s ease !important;
+    }
+
+    .btn-error-primary:hover {
+        opacity: 0.85 !important;
+        color: var(--bs-body-bg) !important;
+    }
+
+    /* Кнопка "Назад" */
+    .btn-error-link {
+        color: var(--bs-emphasis-color) !important;
+        text-decoration: none !important;
+        padding: 10px 20px;
+    }
+
+    .btn-error-link:hover {
+        opacity: 0.7;
+    }
+
+    /* Анимация */
+    @keyframes fadeInError {
+        from { 
+            opacity: 0; 
+            transform: translateY(10px) scale(0.98); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+        }
+    }
+
+    /* Mobile S (320px) */
+    @media (max-width: 320px) {
+        .btn-error-primary {
+            width: 100%;
+            font-size: 0.85rem;
+        }
+        .btn-error-link {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
 {% block title %}Доступ заборонено{% endblock %}
 
 {% block content %}
@@ -24,77 +99,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Контейнер ошибки */
-.error-container {
-    min-height: 70vh;
-    animation: fadeInError 0.4s ease-out forwards;
-}
-
-/* Иконка */
-.error-icon {
-    font-size: clamp(4rem, 10vw, 6.5rem);
-    color: var(--bs-secondary-color);
-    opacity: 0.25;
-}
-
-/* Заголовок и текст */
-.error-title {
-    color: var(--bs-emphasis-color);
-    font-size: clamp(1.2rem, 4vw, 1.8rem);
-}
-
-.error-text {
-    font-size: clamp(0.9rem, 2vw, 1.05rem);
-}
-
-/* Кнопка "На главную" (Черная/Белая инверсия) */
-.btn-error-primary {
-    background-color: var(--bs-emphasis-color) !important;
-    color: var(--bs-body-bg) !important;
-    border: none !important;
-    padding: 10px 25px;
-    transition: opacity 0.2s ease, transform 0.1s ease !important;
-}
-
-.btn-error-primary:hover {
-    opacity: 0.85 !important;
-    color: var(--bs-body-bg) !important;
-}
-
-/* Кнопка "Назад" */
-.btn-error-link {
-    color: var(--bs-emphasis-color) !important;
-    text-decoration: none !important;
-    padding: 10px 20px;
-}
-
-.btn-error-link:hover {
-    opacity: 0.7;
-}
-
-/* Анимация */
-@keyframes fadeInError {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px) scale(0.98); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
-    }
-}
-
-/* Mobile S (320px) */
-@media (max-width: 320px) {
-    .btn-error-primary {
-        width: 100%;
-        font-size: 0.85rem;
-    }
-    .btn-error-link {
-        font-size: 0.85rem;
-    }
-}
-</style>
 {% endblock %}

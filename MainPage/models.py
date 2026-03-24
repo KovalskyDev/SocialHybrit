@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default=ROLE_USER)
 
+
     class Meta:
         verbose_name = "CustomUser"
         verbose_name_plural = "CustomUsers"
@@ -39,7 +40,30 @@ class CustomUser(AbstractUser):
     def is_admin(self):
         """Проверяет, является ли пользователь администратором через поле role."""
         return self.role == self.ROLE_ADMIN
+
+    @property
+    def followers_count(self):
+        """Подсчитывает сколько юзеров подписаны на тебя"""
+        return self.subscribers.count()
+
+    @property
+    def following_count(self):
+        """Подсчитывает сколько у юзера подписок на других"""
+        return self.subscriptions.count()
+
+    def is_following(self, user):
+        """Проверяет, подписан ли текущий юзер на указанного пользователя."""
+        return self.subscriptions.filter(following=user).exists()
     
+    def get_following_ids(self):
+        """Возвращает список ID людей, на которых подписан этот юзер"""
+        return list(self.subscriptions.values_list('following_id', flat=True))
+
+    def get_follower_ids(self):
+        """Возвращает список ID людей, которые подписаны на этого юзера"""
+        return list(self.subscribers.values_list('follower_id', flat=True))
+    
+
     def can_manage(self, user, allow_admin=True):
         """
         Проверяет, может ли конкретный юзер управлять этим постом.
@@ -57,22 +81,21 @@ class CustomUser(AbstractUser):
     
 class Post(models.Model):
     name = models.CharField(max_length=100)
-    about = models.TextField(max_length=2200)
+    about = models.TextField(max_length=2200, null=True, blank=True)
     media = models.FileField(upload_to="post_media/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="posts")
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, related_name="posts")
+    favorites = models.ManyToManyField(CustomUser, blank=True, related_name="favorite_posts")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} НАПИСАНО {self.creator}"
 
     class Meta:
         verbose_name = "Post"
         verbose_name_plural = "Posts"
     
     def can_manage(self, user, allow_admin=True):
-        """
-        Проверяет, может ли конкретный юзер управлять этим постом.
-        """
+        """Проверяет, может ли конкретный юзер управлять этим постом."""
         if not user or user.is_anonymous:
             return False
         
@@ -93,10 +116,15 @@ class Post(models.Model):
     @property
     def replies_count(self):
         return self.replies.count()
+    
+    @property
+    def favorites_count(self):
+        return self.favorites.count()
 
     def save(self, *args, **kwargs):
+        """Удалит пробелы и переносы в начале и конце"""
         if self.about:
-            self.about = self.about.strip() # Удалит пробелы и переносы в начале и конце
+            self.about = self.about.strip()
         super().save(*args, **kwargs)
 
 class Like(models.Model):
@@ -122,3 +150,31 @@ class Reply(models.Model):
 
     def __str__(self):
         return f"{self.user.username} до {self.post.name[:20]}"
+    
+class Subscription(models.Model):
+    # Тот, НА КОГО подписались (звезда)
+    following = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name="subscribers" # ЭТО СПИСОК ТЕХ, КТО ПОДПИСАН НА ЮЗЕРА (Читачі)
+    )
+    # Тот, КТО подписался (фанат)
+    follower = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name="subscriptions" # ЭТО СПИСОК ТЕХ, НА КОГО ПОДПИСАН ЮЗЕР (Відстежувані)
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.follower.username} подписался на {self.following.username}"
+    
+    class Meta:
+        unique_together = ("following", "follower")
+        verbose_name = "Subscription"
+        verbose_name_plural = "Subscriptions"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.follower == self.following:
+            raise ValidationError("Нельзя подписаться на самого себя!")
